@@ -1,0 +1,508 @@
+State= 3 Current= 32 
+State= 1 Current= 32 
+State= 1 Current= 33 
+State= 1 Current= 34 
+State= 1 Current= 35 
+State= 1 Current= 36 
+State= 1 Current= 37 
+State= 1 Current= 38 
+State= 1 Current= 39 
+State= 2 Current= 40 
+START: "11:00:12.964" 
+STOP : "11:00:13.407" 
+State= 3 Current= 40 
+State= 1 Current= 40 
+State= 1 Current= 41 
+State= 1 Current= 42 
+State= 1 Current= 43 
+State= 1 Current= 44 
+State= 1 Current= 45 
+State= 1 Current= 46 
+State= 1 Current= 47 
+State= 2 Current= 48 
+START: "11:00:13.423" 
+STOP : "11:00:13.880" 
+State= 3 Current= 48 
+State= 1 Current= 48 
+State= 1 Current= 49 
+State= 1 Current= 50 
+State= 1 Current= 51 
+State= 1 Current= 52 
+State= 1 Current= 53 
+State= 1 Current= 54 
+State= 1 Current= 55 
+State= 2 Current= 56 
+START: "11:00:13.891" 
+STOP : "11:00:14.350" 
+State= 3 Current= 56 
+State= 1 Current= 56 
+State= 1 Current= 57 
+State= 1 Current= 58 
+State= 1 Current= 59 
+State= 1 Current= 60 
+State= 1 Current= 61 
+State= 1 Current= 62 
+State= 1 Current= 63 
+State= 2 Current= 64 
+START: "11:00:14.359" 
+STOP : "11:00:14.797" 
+State= 3 Current= 64 
+State= 1 Current= 64 
+State= 1 Current= 65 
+State= 1 Current= 66 
+State= 1 Current= 67 
+State= 1 Current= 68 
+State= 1 Current= 69 
+State= 1 Current= 70 
+State= 1 Current= 71 
+State= 2 Current= 72 
+START: "11:00:14.807" 
+STOP : "11:00:15.251" 
+State= 3 Current= 72 
+State= 1 Current= 72 
+State= 1 Current= 73 
+State= 1 Current= 74 
+State= 1 Current= 75 
+State= 1 Current= 76 
+State= 1 Current= 77 
+State= 1 Current= 78 
+State= 1 Current= 79 
+State= 2 Current= 80 
+START: "11:00:15.260" 
+STOP : "11:00:15.687" 
+State= 3 Current= 80 
+State= 1 Current= 80 
+State= 1 Current= 81 
+State= 1 Current= 82 
+State= 1 Current= 83 
+State= 1 Current= 84 
+State= 1 Current= 85 
+State= 1 Current= 86 
+State= 1 Current= 87 
+State= 2 Current= 88 
+START: "11:00:15.709" 
+STOP : "11:00:16.174" 
+State= 3 Current= 88 
+State= 1 Current= 88 
+State= 1 Current= 89 
+State= 1 Current= 90 
+State= 1 Current= 91 
+State= 1 Current= 92 
+State= 1 Current= 93 
+State= 1 Current= 94 
+State= 1 Current= 95 
+State= 2 Current= 0 
+START: "11:00:16.191" 
+STOP : "11:00:16.644" 
+State= 3 Current= 0 
+State= 1 Current= 0 
+State= 1 Current= 1 
+State= 1 Current= 2 
+State= 1 Current= 3 
+State= 1 Current= 4 
+State= 1 Current= 5 
+State= 1 Current= 6 
+State= 1 Current= 7 
+State= 2 Current= 8 
+START: "11:00:16.659" 
+STOP : "11:00:16.998" 
+State= 3 Current= 8 
+State= 1 Current= 8 
+State= 1 Current= 9 
+State= 1 Current= 10 
+State= 1 Current= 11 
+State= 1 Current= 12 
+State= 1 Current= 13 
+State= 1 Current= 14 
+State= 1 Current= 15 
+State= 2 Current= 16 
+START: "11:00:17.009" 
+STOP : "11:00:17.233" 
+State= 3 Current= 16 
+State= 1 Current= 16 
+State= 1 Current= 17 
+State= 1 Current= 18 
+State= 1 Current= 19 
+State= 1 Current= 20 
+State= 1 Current= 21 
+State= 1 Current= 22 
+State= 1 Current= 23 
+State= 2 Current= 24 
+START: "11:00:17.243" 
+STOP : "11:00:17.589" 
+State= 3 Current= 24 
+State= 1 Current= 24 
+State= 1 Current= 25 
+State= 1 Current= 26 
+State= 1 Current= 27 
+State= 1 Current= 28 
+State= 1 Current= 29 
+State= 1 Current= 30 
+State= 1 Current= 31 
+State= 2 Current= 32 
+START: "11:00:17.594" 
+STOP : "11:00:17.831" 
+State= 3 Current= 32 
+State= 1 Current= 32 
+State= 1 Current= 33 
+State= 1 Current= 34 
+State= 1 Current= 35 
+State= 1 Current= 36 
+State= 1 Current= 37 
+State= 1 Current= 38 
+State= 1 Current= 39 
+State= 2 Current= 40 
+START: "11:00:17.843" 
+STOP : "11:00:18.177" 
+State= 3 Current= 40 
+State= 1 Current= 40 
+State= 1 Current= 41 
+State= 1 Current= 42 
+State= 1 Current= 43 
+State= 1 Current= 44 
+State= 1 Current= 45 
+State= 1 Current= 46 
+State= 1 Current= 47 
+State= 2 Current= 48 
+START: "11:00:18.193" 
+STOP : "11:00:18.454" 
+State= 3 Current= 48 
+State= 1 Current= 48 
+State= 1 Current= 49 
+State= 1 Current= 50 
+State= 1 Current= 51 
+State= 1 Current= 52 
+State= 1 Current= 53 
+State= 1 Current= 54 
+State= 1 Current= 55 
+State= 2 Current= 56 
+START: "11:00:18.461" 
+STOP : "11:00:18.772" 
+State= 3 Current= 56 
+State= 1 Current= 56 
+State= 1 Current= 57 
+State= 1 Current= 58 
+State= 1 Current= 59 
+State= 1 Current= 60 
+State= 1 Current= 61 
+State= 1 Current= 62 
+State= 1 Current= 63 
+State= 2 Current= 64 
+START: "11:00:18.783" 
+STOP : "11:00:19.072" 
+State= 3 Current= 64 
+State= 1 Current= 64 
+State= 1 Current= 65 
+State= 1 Current= 66 
+State= 1 Current= 67 
+State= 1 Current= 68 
+State= 1 Current= 69 
+State= 1 Current= 70 
+State= 1 Current= 71 
+State= 2 Current= 72 
+START: "11:00:19.077" 
+STOP : "11:00:19.340" 
+State= 3 Current= 72 
+State= 1 Current= 72 
+State= 1 Current= 73 
+State= 1 Current= 74 
+State= 1 Current= 75 
+State= 1 Current= 76 
+State= 1 Current= 77 
+State= 1 Current= 78 
+State= 1 Current= 79 
+State= 2 Current= 80 
+START: "11:00:19.362" 
+STOP : "11:00:19.664" 
+State= 3 Current= 80 
+State= 1 Current= 80 
+State= 1 Current= 81 
+State= 1 Current= 82 
+State= 1 Current= 83 
+State= 1 Current= 84 
+State= 1 Current= 85 
+State= 1 Current= 86 
+State= 1 Current= 87 
+State= 2 Current= 88 
+START: "11:00:19.678" 
+STOP : "11:00:19.931" 
+State= 3 Current= 88 
+State= 1 Current= 88 
+State= 1 Current= 89 
+State= 1 Current= 90 
+State= 1 Current= 91 
+State= 1 Current= 92 
+State= 1 Current= 93 
+State= 1 Current= 94 
+State= 1 Current= 95 
+State= 2 Current= 0 
+START: "11:00:19.953" 
+STOP : "11:00:20.303" 
+State= 3 Current= 0 
+State= 1 Current= 0 
+State= 1 Current= 1 
+State= 1 Current= 2 
+State= 1 Current= 3 
+State= 1 Current= 4 
+State= 1 Current= 5 
+State= 1 Current= 6 
+State= 1 Current= 7 
+State= 2 Current= 8 
+START: "11:00:20.315" 
+STOP : "11:00:20.654" 
+State= 3 Current= 8 
+State= 1 Current= 8 
+State= 1 Current= 9 
+State= 1 Current= 10 
+State= 1 Current= 11 
+State= 1 Current= 12 
+State= 1 Current= 13 
+State= 1 Current= 14 
+State= 1 Current= 15 
+State= 2 Current= 16 
+START: "11:00:20.662" 
+STOP : "11:00:20.886" 
+State= 3 Current= 16 
+State= 1 Current= 16 
+State= 1 Current= 17 
+State= 1 Current= 18 
+State= 1 Current= 19 
+State= 1 Current= 20 
+State= 1 Current= 21 
+State= 1 Current= 22 
+State= 1 Current= 23 
+State= 2 Current= 24 
+START: "11:00:20.896" 
+STOP : "11:00:21.245" 
+State= 3 Current= 24 
+State= 1 Current= 24 
+State= 1 Current= 25 
+State= 1 Current= 26 
+State= 1 Current= 27 
+State= 1 Current= 28 
+State= 1 Current= 29 
+State= 1 Current= 30 
+State= 1 Current= 31 
+State= 2 Current= 32 
+START: "11:00:21.263" 
+STOP : "11:00:21.499" 
+State= 3 Current= 32 
+State= 1 Current= 32 
+State= 1 Current= 33 
+State= 1 Current= 34 
+State= 1 Current= 35 
+State= 1 Current= 36 
+State= 1 Current= 37 
+State= 1 Current= 38 
+State= 1 Current= 39 
+State= 2 Current= 40 
+START: "11:00:21.515" 
+STOP : "11:00:21.821" 
+State= 3 Current= 40 
+State= 1 Current= 40 
+State= 1 Current= 41 
+State= 1 Current= 42 
+State= 1 Current= 43 
+State= 1 Current= 44 
+State= 1 Current= 45 
+State= 1 Current= 46 
+State= 1 Current= 47 
+State= 2 Current= 48 
+START: "11:00:21.835" 
+STOP : "11:00:22.101" 
+State= 3 Current= 48 
+State= 1 Current= 48 
+State= 1 Current= 49 
+State= 1 Current= 50 
+State= 1 Current= 51 
+State= 1 Current= 52 
+State= 1 Current= 53 
+State= 1 Current= 54 
+State= 1 Current= 55 
+State= 2 Current= 56 
+START: "11:00:22.116" 
+STOP : "11:00:22.430" 
+State= 3 Current= 56 
+State= 1 Current= 56 
+State= 1 Current= 57 
+State= 1 Current= 58 
+State= 1 Current= 59 
+State= 1 Current= 60 
+State= 1 Current= 61 
+State= 1 Current= 62 
+State= 1 Current= 63 
+State= 2 Current= 64 
+START: "11:00:22.447" 
+STOP : "11:00:22.756" 
+State= 3 Current= 64 
+State= 1 Current= 64 
+State= 1 Current= 65 
+State= 1 Current= 66 
+State= 1 Current= 67 
+State= 1 Current= 68 
+State= 1 Current= 69 
+State= 1 Current= 70 
+State= 1 Current= 71 
+State= 2 Current= 72 
+START: "11:00:22.769" 
+STOP : "11:00:23.064" 
+State= 3 Current= 72 
+State= 1 Current= 72 
+State= 1 Current= 73 
+State= 1 Current= 74 
+State= 1 Current= 75 
+State= 1 Current= 76 
+State= 1 Current= 77 
+State= 1 Current= 78 
+State= 1 Current= 79 
+State= 2 Current= 80 
+START: "11:00:23.081" 
+STOP : "11:00:23.388" 
+State= 3 Current= 80 
+State= 1 Current= 80 
+State= 1 Current= 81 
+State= 1 Current= 82 
+State= 1 Current= 83 
+State= 1 Current= 84 
+State= 1 Current= 85 
+State= 1 Current= 86 
+State= 1 Current= 87 
+State= 2 Current= 88 
+START: "11:00:23.398" 
+STOP : "11:00:23.627" 
+State= 3 Current= 88 
+State= 1 Current= 88 
+State= 1 Current= 89 
+State= 1 Current= 90 
+State= 1 Current= 91 
+State= 1 Current= 92 
+State= 1 Current= 93 
+State= 1 Current= 94 
+State= 1 Current= 95 
+State= 2 Current= 0 
+START: "11:00:23.635" 
+STOP : "11:00:23.978" 
+State= 3 Current= 0 
+State= 1 Current= 0 
+State= 1 Current= 1 
+State= 1 Current= 2 
+State= 1 Current= 3 
+State= 1 Current= 4 
+State= 1 Current= 5 
+State= 1 Current= 6 
+State= 1 Current= 7 
+State= 2 Current= 8 
+START: "11:00:23.982" 
+STOP : "11:00:24.352" 
+State= 3 Current= 8 
+State= 1 Current= 8 
+State= 1 Current= 9 
+State= 1 Current= 10 
+State= 1 Current= 11 
+State= 1 Current= 12 
+State= 1 Current= 13 
+State= 1 Current= 14 
+State= 1 Current= 15 
+State= 2 Current= 16 
+START: "11:00:24.365" 
+STOP : "11:00:24.588" 
+State= 3 Current= 16 
+State= 1 Current= 16 
+State= 1 Current= 17 
+State= 1 Current= 18 
+State= 1 Current= 19 
+State= 1 Current= 20 
+State= 1 Current= 21 
+State= 1 Current= 22 
+State= 1 Current= 23 
+State= 2 Current= 24 
+START: "11:00:24.599" 
+STOP : "11:00:24.952" 
+State= 3 Current= 24 
+State= 1 Current= 24 
+State= 1 Current= 25 
+State= 1 Current= 26 
+State= 1 Current= 27 
+State= 1 Current= 28 
+State= 1 Current= 29 
+State= 1 Current= 30 
+State= 1 Current= 31 
+State= 2 Current= 32 
+START: "11:00:24.966" 
+STOP : "11:00:25.190" 
+State= 3 Current= 32 
+State= 1 Current= 32 
+State= 1 Current= 33 
+State= 1 Current= 34 
+State= 1 Current= 35 
+State= 1 Current= 36 
+State= 1 Current= 37 
+State= 1 Current= 38 
+State= 1 Current= 39 
+State= 2 Current= 40 
+START: "11:00:25.206" 
+STOP : "11:00:25.510" 
+State= 3 Current= 40 
+State= 1 Current= 40 
+State= 1 Current= 41 
+State= 1 Current= 42 
+State= 1 Current= 43 
+State= 1 Current= 44 
+State= 1 Current= 45 
+State= 1 Current= 46 
+State= 1 Current= 47 
+State= 2 Current= 48 
+START: "11:00:25.516" 
+STOP : "11:00:25.789" 
+State= 3 Current= 48 
+State= 1 Current= 48 
+State= 1 Current= 49 
+State= 1 Current= 50 
+State= 1 Current= 51 
+State= 1 Current= 52 
+State= 1 Current= 53 
+State= 1 Current= 54 
+State= 1 Current= 55 
+State= 2 Current= 56 
+START: "11:00:25.800" 
+STOP : "11:00:26.142" 
+State= 3 Current= 56 
+State= 1 Current= 56 
+State= 1 Current= 57 
+State= 1 Current= 58 
+State= 1 Current= 59 
+State= 1 Current= 60 
+State= 1 Current= 61 
+State= 1 Current= 62 
+State= 1 Current= 63 
+State= 2 Current= 64 
+START: "11:00:26.164" 
+STOP : "11:00:26.456" 
+State= 3 Current= 64 
+State= 1 Current= 64 
+State= 1 Current= 65 
+State= 1 Current= 66 
+State= 1 Current= 67 
+State= 1 Current= 68 
+State= 1 Current= 69 
+State= 1 Current= 70 
+State= 1 Current= 71 
+State= 2 Current= 72 
+START: "11:00:26.466" 
+STOP : "11:00:26.739" 
+State= 3 Current= 72 
+State= 1 Current= 72 
+State= 1 Current= 73 
+State= 1 Current= 74 
+State= 1 Current= 75 
+State= 1 Current= 76 
+State= 1 Current= 77 
+State= 1 Current= 78 
+State= 1 Current= 79 
+State= 2 Current= 80 
+START: "11:00:26.751" 
+STOP : "11:00:27.058" 
+State= 3 Current= 80 
+State= 1 Current= 80 
+State= 1 Current= 81 
+State= 1 Current= 82
