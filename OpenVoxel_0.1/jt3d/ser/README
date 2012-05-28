@@ -1,0 +1,11 @@
+Jamie Tremaine, 2012
+-----------------------------
+
+Built with SFML. To install SFML:
+sudo apt-get build-dep libsfml
+
+Interfacing with the arduino:
+http://arduino.cc/playground/Interfacing/LinuxTTY
+http://todbot.com/blog/2006/12/06/arduino-serial-c-code-to-talk-to-arduino/#comments
+
+

@@ -1,0 +1,67 @@
+===============================================================================
+DisplayProgramming User Manual
+===============================================================================
+
+===============================================================================
+I. I2C Command issuing
+===============================================================================
+By default, application doesn't send any I2C command to any device.
+
+To send command to device /dev/i2c-3 you should pass /dev/i2c-3 as parameter.
+and 5 bytes representing i2c command.
+
+Example:
+--------
+Sending command to device /dev/i2c-3:
+./DisplayProgramming --i2c_device /dev/i2c-3 15 0 0 0 0
+
+If sending fail, application will output error message to console and exit.
+
+===============================================================================
+II. Selecting three bitmaps
+===============================================================================
+Application expect images in JPG format. They should be placed in current
+working directory (directory from which you execute application).
+Number of sets is specified with --num_sets and number of images in set with
+--num_per_set
+
+Names of the images are:
+image00001.jpg
+image00002.jpg
+image00003.jpg
+.
+.
+.
+
+===============================================================================
+IV. Troubleshooting
+===============================================================================
+
+1. I2C Command is failing
+------------------------------------------------
+Check if you selected proper I2C device. Usually device file names /dev/i2c-X are
+assigned dynamically (their numbers) after reboot and they are subject of change.
+
+If device is SMBus device instead of plain I2C sending may fail. In that case
+support for SMBus must be programmed in application.
+
+2. There is flickering when images are displayed.
+------------------------------------------------
+On some hardware, you need to activate OpenGL VSync. This can be done in graphic
+card application which is shipped with drivers. Also, you can do that by editing
+xserver config files.
+
+3. Slides are slow
+------------------------------------------------
+Check if OpenGL is accelerated. If not, install proprietary drivers.
+
+4. Application doesn't load images
+------------------------------------------------
+Check if images are in proper format (JPEG). Do not rely on extension as it may be
+changed.
+
+Also, check if images are in working directory.
+
+5. Application cannot write to parallel port
+------------------------------------------------
+Check if current user has priviledges to access port
