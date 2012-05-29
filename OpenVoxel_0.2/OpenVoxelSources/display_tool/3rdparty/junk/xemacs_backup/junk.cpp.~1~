@@ -1,0 +1,7 @@
+#include <iostream>
+
+void main()
+{
+  for(int i=0;i<30;i++)
+    cout << i%4 << endl;
+}
