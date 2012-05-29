@@ -14,14 +14,14 @@ SOURCES += \
 main.cpp\
 widget.cpp\
 PortListener.cpp\
-tcpclient.cpp \
-LCCommand.cpp
+tcpclient.cpp 
+#LCCommand.cpp
 HEADERS  += widget.h \
 helpers.h\
 config.h\
 PortListener.h \
-tcpclient.h \
-LCCommand.h
+tcpclient.h 
+#LCCommand.h
 
 FORMS +=
 
