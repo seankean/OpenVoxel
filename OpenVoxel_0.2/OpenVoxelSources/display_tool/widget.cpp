@@ -69,8 +69,8 @@ if(interlace_levels)
   m_timer = new QTimer(this);
   m_timespent= new QElapsedTimer();
   m_timelastdraw= new QElapsedTimer();
-  connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
-  m_timer->setInterval(50); // 20 times a second we paint 3 frames 
+  //  connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
+  m_timer->setInterval(50); // times a second we paint drawmax frames 
   QTimer::singleShot(0, this, SLOT(startShow()));
 }
 
@@ -88,52 +88,70 @@ Widget::~Widget()
 
 void Widget::paintEvent(QPaintEvent *)
 {
-  int drawmax=4;
+  int drawmax=600;
   QString c;
   QPainter painter(this);
   int Txoff=0,Tyoff=0;
-  if(m_total==0)
-    {
-      m_timespent->restart();
-    }
-  else if (m_total>59)
-    {
-      m_total=0;
-      qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
-      return;
-    }
-  for(int i=0;i<drawmax;i++) // every 50 ms we draw three images for 60 images per second
-    {
-      //wait till we're ready...
-      while( (m_timespent->elapsed()) < (m_total*(1000/60)) )
+      if(m_total==0)
 	{
-	  m_total=m_total; // do nothing
+	  m_timespent->restart();
 	}
-      
-      qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-      qDebug() << "painting level: " << m_current; 
-      painter.drawPixmap(0,0, m_pixmap[m_current]);
-      if(drawmax-1>i) // dont swap after the last draw just flush
-	swapBuffers();
-      // 	  glFlush();
-      c= QString("%1").arg(m_total%((m_num_images*2)-1));
-      listener->port->write(qPrintable(c),1);
-      qDebug() << "Sent to " << *m_serial_device << c << " starting at level " << m_current; 
-      m_current+=m_direction;
-      m_total++;
-      if(m_current > (m_num_images-1) )
+      else if (m_total>59)
 	{
-	  m_current = m_num_images-1;
-	  m_direction = -m_direction;
+	  m_total=0;
+	  qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
+	  //return;
 	}
-      else if(m_current < 0)
+      for(int i=0;i<drawmax;i++) // every 50 ms we draw three images for 60 images per second
 	{
-	  m_current = 0;
-	  m_direction = -m_direction;
+	  if(m_total>0)
+	    {
+	      //wait till we're ready...
+
+	      if (i%4==0)
+		Txoff=1;
+	      else
+		Txoff=0;
+
+	      while( (m_timespent->elapsed()) < (16+Txoff) )
+		{
+		  m_total=m_total; // do nothing
+		}
+	    }
+	  qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
+	  qDebug() << "painting level: " << m_current; 
+	  c= QString("%1").arg(m_total%(m_num_images*2));
+	  listener->port->write(qPrintable(c),1);
+	  qDebug() << "Sent to " << *m_serial_device << c << " starting at level " << m_current; 
+	  painter.drawPixmap(0,0, m_pixmap[m_current]);
+	  if(drawmax-1>i) // dont swap after the last draw just flush
+	    swapBuffers();
+	  glFlush();
+	  m_current+=m_direction;
+	  m_total++;
+	  if(m_current > (m_num_images-1) )
+	    {
+	      m_current = m_num_images-1;
+	      m_direction = -m_direction;
+	    }
+	  else if(m_current < 0)
+	    {
+	      m_current = 0;
+	      m_direction = -m_direction;
+	    }
+
+	}
+      if(m_total==0)
+	{
+	  m_timespent->restart();
+	}
+      else if (m_total>59)
+	{
+	  m_total=0;
+	  qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
 	}
 
-    }
-
+      QTimer::singleShot(0, this, SLOT(update()));     
 }
 
  void Widget::resizeGL(int width, int height)
