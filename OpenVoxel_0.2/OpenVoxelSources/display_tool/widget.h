@@ -12,7 +12,7 @@ class Widget : public QGLWidget
   Q_OBJECT
 
 public:
-  explicit Widget(int delay_before, int delay_after,  int num_images, QString *serial_device, QString *camera_ip, QString * image_prefix, bool interlace_levels, bool numbers,QWidget *parent = 0,QGLFormat *format=0);
+  explicit Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString * image_prefix, bool interlace_levels, bool numbers,QWidget *parent = 0,QGLFormat *format=0);
   ~Widget();
   enum State {Stopped = 0, Drawing, EndOfSet, WaitingAfter};
     
@@ -42,6 +42,7 @@ private:
   unsigned int m_delay_after;
   bool m_interlace_levels;
   int m_num_images;
+  unsigned int m_max_time;
   int m_total;
   unsigned char m_port_value;
   bool m_first_run;

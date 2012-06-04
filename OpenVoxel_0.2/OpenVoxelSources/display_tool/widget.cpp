@@ -90,9 +90,11 @@ Widget::~Widget()
 void Widget::paintEvent(QPaintEvent *)
 {
 	int drawmax=  m_max_time * 60; 
+	
 	QString c;
 	QPainter painter(this);
 	int Txoff=0,Tyoff=0;
+	
 	if(m_total==0)
 	{
 		m_timespent->restart();
@@ -105,6 +107,10 @@ void Widget::paintEvent(QPaintEvent *)
 	}
 	for(int i=0;i<drawmax;i++) // every 50 ms we draw three images for 60 images per second
 	{
+		QElapsedTimer delayTimer;
+		
+		delayTimer.start();
+		
 		if(m_total>0)
 		{
 			//wait till we're ready...
