@@ -15,10 +15,10 @@ using namespace std;
 int main(int argc, char *argv[])
 {
 
-	DrawWidget widg(684,608,300);
-
+	DrawWidget widg(684,608,640);
 
 	cout << widg.getXSize() << " " << widg.getYSize() << " " << widg.getZSize() << " " << endl;
+
 	cout << widg.getXScale() << " " << widg.getYScale() << " " << widg.getZScale() << " " << endl;
 
 	rgbPixel white;
@@ -31,28 +31,17 @@ int main(int argc, char *argv[])
 	black.g = 0;
 	black.b = 0;
 
-	for(int y = 0; y < widg.getYSize(); y++){
-		for(int x = 0; x < widg.getXSize(); x++){
-			if(x > 250 && x < 300)
-				widg.setPixel(0, 0, 1, black);
-			else
-				widg.setPixel(0, x, y, white);
+	//replace the next piece with initalization to 0
+	for(int z = 0; z < 64; z++){
+		for(int y = 0; y < widg.getYSize(); y++){
+			for(int x = 0; x < widg.getXSize(); x++){
+				widg.setPixel(0, x, y, black);
+			}
 		}
 	}
 
-
-/*
-	for(int y = 0; y < widg.getYSize();  y++){
-		for(int x = 0; x < widg.getXSize(); x++){
-			cout << (int)widg.getPixel(0, x, y).r << " ";
-			cout << (int)widg.getPixel(0, x, y).g << " ";
-			cout << (int)widg.getPixel(0, x, y).b << " ";
-		}
-			cout << endl;
-	}
-	*/
-
-	const char *file = "first.bmp";
+	widg.drawSphere(200);
+	const char *file = "images";
 
 	if(widg.saveBMP(file))
 		cout << "Saved!"<< endl;
@@ -60,5 +49,6 @@ int main(int argc, char *argv[])
 		cout << "Didn't save!"<< endl;
 
 	return 0;
+
 }
 
