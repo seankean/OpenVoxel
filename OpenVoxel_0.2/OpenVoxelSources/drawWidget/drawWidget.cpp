@@ -7,8 +7,11 @@
 //				 the voxiebox.
 //				TODO: Remove dynamic memory allocation
 //					-Split levels in 3 color planes that are 8 steps in time
+//					-Write out bitmaps that reprensent 3 images for down
+//						and 3 images for up
 //					-Correct for travel from bottom to top and reversing colors
 //					-Change to least significant bit first
+//					-Change the order of the bitmaps to be ordered GRB
 //============================================================================
 
 #include "drawWidget.h"
