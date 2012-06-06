@@ -5,6 +5,10 @@
 // Copyright   : 
 // Description : A widget to set up the drawing scene and draw objects to
 //				 the voxiebox.
+//				TODO: Remove dynamic memory allocation
+//					-Split levels in 3 color planes that are 8 steps in time
+//					-Correct for travel from bottom to top and reversing colors
+//					-Change to least significant bit first
 //============================================================================
 
 #include "drawWidget.h"
@@ -14,9 +18,8 @@ using namespace std;
 //dimensions of the projector
 const int xMax = 684;
 const int yMax = 608;
-const int zMax = 640; //100 pix per layer, used for interpolation later
-//const int levels = 64;
-const int stepCount = 8;
+const int zMax = 240; //100 pix per layer, used for interpolation later
+const int stepCount = 3;
 const int colorBits = 8;
 
 DrawWidget::DrawWidget(int xWidth,int yDepth,int zHeight){
@@ -91,7 +94,7 @@ void DrawWidget::convertToBMP()
 	RGBApixel p;
 	int r,g,b;
 	int count = 0;
-	for(int z = 0; z < LEVELS; z+=8){
+	for(int z = 0; z < LEVELS; z++){
 
 		for(int y = 0; y < yMax; y++){
 			for(int x = 0; x < xMax; x++){ //this is some nasty loop
