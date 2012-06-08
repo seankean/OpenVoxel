@@ -1,25 +1,32 @@
 #include "widget.h"
-#include "helpers.h"
+//#include "helpers.h"
+#include <QThread>
 #include <QTimer>
 #include <QDebug>
 #include <QShortcut>
 #include <QtGui>
 
-#include <QTcpSocket>
-
-#include "tcpclient.h" // tcp for camera
 
 #include "qextserialport.h" // serial for arduino
 #include "PortListener.h" // serial for arduino
 #include "config.h"
+class Helper: public QThread 
+{
+public:
+	static void msleep(int ms)
+	{
+		QThread::msleep(ms);
+	}
+};
 
 
-Widget::Widget(int delay_before, int delay_after, int num_images, QString *serial_device, QString *camera_ip, QString *image_prefix, bool interlace_levels, bool numbers, QWidget *parent, QGLFormat *format)
+Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString *image_prefix, bool interlace_levels, bool numbers, QWidget *parent, QGLFormat *format)
   :QGLWidget(*format, parent)
   , m_current(0)
   , m_state(Stopped)
   , m_delay_before(delay_before)
   , m_delay_after(delay_after)
+  , m_max_time(max_time)
   , m_num_images(num_images)
   , m_port_value(0x0)
   , m_first_run(true)
@@ -42,7 +49,7 @@ Widget::Widget(int delay_before, int delay_after, int num_images, QString *seria
  
   QString portName(*m_serial_device);           
   listener = new PortListener(portName);        // signals get hooked up internally
-  cam_sock = new tcpClient(this);
+  //cam_sock = new tcpClient(this);
 
 if(interlace_levels)
     m_direction=2;  // every other frame
@@ -72,6 +79,7 @@ if(interlace_levels)
   //  connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
   m_timer->setInterval(50); // times a second we paint drawmax frames 
   QTimer::singleShot(0, this, SLOT(startShow()));
+
 }
 
 Widget::~Widget()
@@ -88,9 +96,10 @@ Widget::~Widget()
 
 void Widget::paintEvent(QPaintEvent *)
 {
-  int drawmax=600;
+  int drawmax=  m_max_time * 60; 
   QString c;
   QPainter painter(this);
+  QThread t(this);
   int Txoff=0,Tyoff=0;
       if(m_total==0)
 	{
@@ -116,6 +125,7 @@ void Widget::paintEvent(QPaintEvent *)
 	      while( (m_timespent->elapsed()) < (16+Txoff) )
 		{
 		  m_total=m_total; // do nothing
+		  Helper::msleep(2);
 		}
 	    }
 	  qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");

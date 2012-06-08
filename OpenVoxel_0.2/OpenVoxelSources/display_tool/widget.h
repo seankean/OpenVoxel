@@ -6,7 +6,7 @@
 #include <QPointer>
 #include <QElapsedTimer>
 #include "PortListener.h"
-#include "tcpclient.h"
+
 class Widget : public QGLWidget
 {
   Q_OBJECT
@@ -21,7 +21,7 @@ protected:
   void perspectiveProjection();
   void paintEvent(QPaintEvent *);
   PortListener *listener;
-  tcpClient *cam_sock;
+  //  tcpClient *cam_sock;
   QString * m_serial_device;
   QString * m_camera_ip;
   QString * m_image_prefix;

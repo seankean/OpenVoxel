@@ -13,15 +13,15 @@ TEMPLATE = app
 SOURCES += \
 main.cpp\
 widget.cpp\
-PortListener.cpp\
-tcpclient.cpp 
-#LCCommand.cpp
-HEADERS  += widget.h \
+PortListener.cpp
+
+HEADERS  += \
+widget.h \
 helpers.h\
 config.h\
-PortListener.h \
-tcpclient.h 
-#LCCommand.h
+PortListener.h 
+
+
 
 FORMS +=
 
