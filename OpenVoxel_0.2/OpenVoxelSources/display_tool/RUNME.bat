@@ -1,6 +1,4 @@
 @echo on
 set PATH=%PATH%;c:\Qt\4.8.1\lib
-.\release\DisplayProgramming --max_time 45 --serial_device COM3 --camera_ip 192.168.1.100:5555 --num_images 4 --image_prefix testimages\image --fullscreen
-
-REM .\release\DisplayProgramming --serial_device COM3 --camera_ip 192.168.1.100:5555 --num_images 100 --image_prefix tarzanimages\image
+.\release\DisplayProgramming --max_time 10000 --serial_device COM3 --camera_ip 192.168.1.100:5555 --num_images 8 --image_prefix align\image --fullscreen 2> log.txt
 

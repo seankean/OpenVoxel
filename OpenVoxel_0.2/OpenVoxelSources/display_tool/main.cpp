@@ -16,7 +16,7 @@ int max_time = 1;
 bool interlace_levels = false;
 bool fullscreen=false;
 bool numbers=false;
-
+bool rotate=false;
 void dump_args()
 {
 	qDebug() << "Args:";
@@ -26,6 +26,7 @@ void dump_args()
 	qDebug() << "delay_before " << delay_before;
 	qDebug() << "delay_after " << delay_after;
 	qDebug() << "max_time " << max_time;
+	qDebug() << "rotate " << rotate ;
 	qDebug() << "num_images " << num_images;
 	qDebug() << "interlace_levels " << interlace_levels;
 	qDebug() << "fullscreen " << fullscreen;
@@ -56,7 +57,9 @@ void usage()
 		<< "--camera_ip \t<ipaddr:port of the camera> NOT_IMPLEMENTED " << std::endl
 		<< "--delay_before \t<msecond delay before images are rendered> (Default is 0) " << std::endl
 		<< "--delay_after \t<msecond delay after images are rendered>" << std::endl
-		<< "--max_time \t<time in seconds to run>" << std::endl;
+		<< "--max_time \t<time in seconds to run>" << std::endl
+		<< "--rotate \t<rotate the image around>" << std::endl;
+
 }
 
 
@@ -97,6 +100,10 @@ int main(int argc, char *argv[])
 		{
 			numbers=true;
 		}
+		else if(arguments.at(i) == "--rotate")
+		{
+			rotate=true;
+		}
 		else if(arguments.at(i) == "--image_prefix")
 		{
 			image_prefix = arguments.at(++i);
@@ -132,7 +139,7 @@ int main(int argc, char *argv[])
 	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 	QGLFormat *format = new QGLFormat(QGL::SampleBuffers);
 	format->setSwapInterval(1); // vsync
-	Widget w(delay_before, delay_after, max_time, num_images,&serial_device,&camera_ip,&image_prefix,interlace_levels,numbers,0,format);
+	Widget w(delay_before, delay_after, max_time, num_images,&serial_device,&camera_ip,&image_prefix,interlace_levels,numbers,0,format, rotate);
 	w.resize(608,684);
 	if(fullscreen)
 		w.showFullScreen();

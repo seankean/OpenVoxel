@@ -20,7 +20,7 @@ public:
 };
 
 
-Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString *image_prefix, bool interlace_levels, bool numbers, QWidget *parent, QGLFormat *format)
+Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString *image_prefix, bool interlace_levels, bool numbers, QWidget *parent, QGLFormat *format, bool rotate)
   :QGLWidget(*format, parent)
   , m_current(0)
   , m_state(Stopped)
@@ -35,6 +35,7 @@ Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, 
   , m_image_prefix(image_prefix)
   , m_interlace_levels(interlace_levels)
   , m_numbers(numbers)
+  , m_rotate(rotate)
 {
   setAutoFillBackground(false);
   makeCurrent();
@@ -72,7 +73,8 @@ if(interlace_levels)
     }
 
   
-
+  m_curr_angle = 0;
+  m_draw_count = 0;
   m_timer = new QTimer(this);
   m_timespent= new QElapsedTimer();
   m_timelastdraw= new QElapsedTimer();
@@ -96,12 +98,16 @@ Widget::~Widget()
 
 void Widget::paintEvent(QPaintEvent *)
 {
-  int drawmax=  m_max_time * 60; 
+  int drawmax=  m_max_time * 60;
+
+  int rotSpeed = 10;//for the bunny
+  int rotAngle = 1;//for the bunny
+
   QString c;
   QPainter painter(this);
   QThread t(this);
   int Txoff=0,Tyoff=0;
-      if(m_total==0)
+    if(m_total==0)
 	{
 	  m_timespent->restart();
 	}
@@ -111,7 +117,15 @@ void Widget::paintEvent(QPaintEvent *)
 	  qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
 	  //return;
 	}
-      for(int i=0;i<drawmax;i++) // every 50 ms we draw three images for 60 images per second
+	
+	//bunny hack
+	if(m_rotate){
+		glTranslatef(270,345,0);
+		glRotatef((float)m_curr_angle, 0, 0, 1);  
+		glTranslatef(-270, -345,0);
+	}
+	  
+    for(int i=0;i<drawmax;i++) // every 50 ms we draw three images for 60 images per second
 	{
 	  if(m_total>0)
 	    {
@@ -130,15 +144,22 @@ void Widget::paintEvent(QPaintEvent *)
 	    }
 	  qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
 	  qDebug() << "painting level: " << m_current; 
-	  c= QString("%1").arg(m_total%(m_num_images*2));
+	  
+      c= QString("%1").arg(m_total%(m_num_images));
 	  listener->port->write(qPrintable(c),1);
+	  
 	  qDebug() << "Sent to " << *m_serial_device << c << " starting at level " << m_current; 
+	  qDebug() << "Read from " << *m_serial_device << listener->port->readAll();
+	  
+	  
 	  painter.drawPixmap(0,0, m_pixmap[m_current]);
+	  
 	  if(drawmax-1>i) // dont swap after the last draw just flush
 	    swapBuffers();
 	  glFlush();
 	  m_current+=m_direction;
 	  m_total++;
+	  
 	  if(m_current > (m_num_images-1) )
 	    {
 	      m_current = m_num_images-1;
@@ -150,8 +171,22 @@ void Widget::paintEvent(QPaintEvent *)
 	      m_direction = -m_direction;
 	    }
 
+		//this section is just a hack for the rotating bunny
+		//comment out if you're using it
+		if(m_rotate){
+			qDebug() << "Current angle: " << m_curr_angle;
+			if(i % rotSpeed == 0){
+				glTranslatef(270,345,0);
+				glRotatef((float)rotAngle, 0, 0, 1);  
+				glTranslatef(-270, -345,0);
+				m_curr_angle += rotAngle;
+			}
+			
+		}
+		//end bunny hack
+	
 	}
-      if(m_total==0)
+    if(m_total==0)
 	{
 	  m_timespent->restart();
 	}
@@ -160,8 +195,8 @@ void Widget::paintEvent(QPaintEvent *)
 	  m_total=0;
 	  qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
 	}
-
-      QTimer::singleShot(0, this, SLOT(update()));     
+	close();
+      
 }
 
  void Widget::resizeGL(int width, int height)
