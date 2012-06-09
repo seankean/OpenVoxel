@@ -26,7 +26,9 @@ static double ZSCL=100.0;
 static int  PLYXCENTER=0;
 static int  PLYYCENTER=0;
 static int  PLYZCENTER=0;
-static bool swapYZ=true;
+static bool swapYZ=false;
+static bool swapXY=false;
+static bool swapXZ=false;
 static double t=0;
 
 
@@ -67,6 +69,16 @@ static int vertex_cb_z(p_ply_argument argument) {
       qDebug() << "Swapping Z and Y before scaling";
       qDebug() << "New Z " << Z << " New Y " << Y;
     }
+
+  if(swapXY==true)
+    {
+      t=Y;
+      Y=X;
+      X=t;
+      qDebug() << "Swapping Z and Y before scaling";
+      qDebug() << "New Z " << Z << " New Y " << Y;
+    }
+
   qDebug() << "Before scaling: \tX " << X << " Y " << Y << " Z " << Z;
   int x=0,y=0,z=0;
   double Xs = ((XSCL*X)+MIDX+PLYXCENTER);
@@ -78,10 +90,10 @@ static int vertex_cb_z(p_ply_argument argument) {
   y = ( int)Ys;
   z = ( int)Zs;
   
-  qDebug() << "After assigning to unsigned int: x " << x << " y " << y << " z " << z;
+  qDebug() << "After assigning to int: x " << x << " y " << y << " z " << z;
   
   // keep these values in range 1 to (MAX+1)
-  if(  x<1 || y<1 || z<1 || x > (MAXX+1) || y >= (MAXY+1) || z>= (MAXZ+1) )
+  if(  x<1 || y<1 || z<1 || x > (int)(MAXX+1) || y >= (int)(MAXY+1) || z>= (int)(MAXZ+1) )
     {
       qDebug() << "Out of Range!!!";
       return 1;
@@ -90,6 +102,9 @@ static int vertex_cb_z(p_ply_argument argument) {
   x--;
   y--;
   z--;
+
+  // reverse Z
+  z=71-z;
 
   // Example for z=40(41):
   // bmp_ind=(unsigned int)(z/MAXPERLV):bmp_ind=(int)(40/MAXPERLV) = 1.66 = 1 which is the middle image set.
@@ -205,6 +220,18 @@ int main(int argc, char *argv[])
       else if(arguments.at(i) == "--ply_zcenter")
 	{
 	  ply_zcenter = arguments.at(++i).toInt();
+	}
+      else if(arguments.at(i) == "--swapXY")
+	{
+	  swapXY=true;
+	}
+      else if(arguments.at(i) == "--swapXZ")
+	{
+	  swapXZ=true;
+	}
+      else if(arguments.at(i) == "--swapYZ")
+	{
+	  swapYZ=true;
 	}
       else
 	{
