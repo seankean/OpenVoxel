@@ -12,10 +12,10 @@ TEMPLATE = app
 
 SOURCES += \
 ply2vxbx.cpp\
-../DisplayProgram/3rdparty/rply-1.1.1/rply.c
+../display_tool/3rdparty/rply-1.1.1/rply.c
 
 HEADERS  += \
-../DisplayProgram/3rdparty/rply-1.1.1/rply.h
+../display_tool/3rdparty/rply-1.1.1/rply.h
 
 
 FORMS +=

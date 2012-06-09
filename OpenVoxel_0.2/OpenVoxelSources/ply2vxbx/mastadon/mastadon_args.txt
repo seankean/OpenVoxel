@@ -1,0 +1,1 @@
+./ply2vxbx --ply_file ./mastadon.ply --xscale -300 --yscale 40 --zscale -10 --ply_xcenter 0 --ply_ycenter -200 --ply_zcenter -20 

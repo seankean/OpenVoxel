@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QDir>
-#include "../DisplayProgram/3rdparty/rply-1.1.1/rply.h"
+#include "../display_tool/3rdparty/rply-1.1.1/rply.h"
 #include <math.h>
 double Z=0.0,X=0.0,Y=0.0;
 
@@ -20,12 +20,14 @@ static unsigned int MIDY=MAXY/2;
 static unsigned int MIDZ=MAXZ/2;
 static unsigned int MAXIM=MAXZ/MAXPERLV;
 static unsigned int MAXBITPERCOLOR=8;
-static int XSCL=1000;
-static int YSCL=1000;
-static int ZSCL=1000;
+static double XSCL=1000.0;
+static double YSCL=1000.0;
+static double ZSCL=100.0;
 static int  PLYXCENTER=0;
 static int  PLYYCENTER=0;
 static int  PLYZCENTER=0;
+static bool swapYZ=true;
+static double t=0;
 
 
 QImage imlist[3];
@@ -57,17 +59,38 @@ static int vertex_cb_z(p_ply_argument argument) {
   // we should have eveyone for this line as we have Z called last for each line...
   // scale and add our center to the value...
 
-  unsigned int x=0,y=0,z=0;
-  x = (XSCL*X)+MIDX+PLYXCENTER;
-  y = (YSCL*Y)+MIDY+PLYYCENTER;
-  z = (ZSCL*Z)+MIDZ+PLYZCENTER;
+  if(swapYZ==true)
+    {
+      t=Y;
+      Y=Z;
+      Z=t;
+      qDebug() << "Swapping Z and Y before scaling";
+      qDebug() << "New Z " << Z << " New Y " << Y;
+    }
+  qDebug() << "Before scaling: \tX " << X << " Y " << Y << " Z " << Z;
+  int x=0,y=0,z=0;
+  double Xs = ((XSCL*X)+MIDX+PLYXCENTER);
+  double Ys = ((YSCL*Y)+MIDY+PLYYCENTER);
+  double Zs = ((ZSCL*Z)+MIDZ+PLYZCENTER);
+  qDebug() << "After scaling:    \tXs " << Xs << " Ys " << Ys << " Zs " << Zs;
+
+  x = (int)Xs;
+  y = ( int)Ys;
+  z = ( int)Zs;
   
-
-  if( x<0 || x >= (int)MAXX || y<0 || y>= (int)MAXY || z<=0 || z>= (int)MAXZ )
-    return 1;
-
-  // z is 1-72 lets make it an index [0-71]
+  qDebug() << "After assigning to unsigned int: x " << x << " y " << y << " z " << z;
+  
+  // keep these values in range 1 to (MAX+1)
+  if(  x<1 || y<1 || z<1 || x > (MAXX+1) || y >= (MAXY+1) || z>= (MAXZ+1) )
+    {
+      qDebug() << "Out of Range!!!";
+      return 1;
+    }
+  // now make them all zero based indexes
+  x--;
+  y--;
   z--;
+
   // Example for z=40(41):
   // bmp_ind=(unsigned int)(z/MAXPERLV):bmp_ind=(int)(40/MAXPERLV) = 1.66 = 1 which is the middle image set.
   // adj_z_in_vseg_ind=(unsigned int)(z-(bmp_ind*MAXPERLV)): (unsigned int)(40-(1*24)) = 16 which is the (top,last,pos) for R
@@ -79,19 +102,20 @@ static int vertex_cb_z(p_ply_argument argument) {
   // c_byte_value_first = pow(2,(adj_z__bit_val-1)) 
   // c_byte_value_second = pow(2,(8-(adj_z__bit_val-1))) the first bit[7] becomes bit[1] the second time.  
 
-  unsigned int bmp_ind=(unsigned int)(z/MAXPERLV); 
+  
+  unsigned int bmp_ind=(unsigned int)(z/MAXPERLV);  
   unsigned int adj_z_in_vseg_ind=(unsigned int)(z-(bmp_ind*MAXPERLV)); 
   unsigned int adj_z_in_color_ind=(unsigned int)(adj_z_in_vseg_ind/MAXBITPERCOLOR); 
-  unsigned int adj_z_bit_val=(unsigned int)adj_z_in_vseg_ind-(int(adj_z_in_color_ind*MAXBITPERCOLOR));
-  int c_byte_value_first = pow(2,(adj_z_bit_val-1)) ;
-  int c_byte_value_second = pow(2,(8-(adj_z_bit_val-1))); // the first bit[7] becomes bit[1] the second time.  
+  unsigned int adj_z_bit_pos=(unsigned int)adj_z_in_vseg_ind-(adj_z_in_color_ind*MAXBITPERCOLOR);
+  unsigned int c_byte_value_first = (unsigned int)pow(2,(adj_z_bit_pos)) ;
+  unsigned int c_byte_value_second = (unsigned int)pow(2,(8-(adj_z_bit_pos))); // the first bit[7] becomes bit[1] the second time.  
     
     
   qDebug() << "x=" << x << " y=" << y << " z=" << z;
   qDebug() << " bmp_ind="  << bmp_ind;
   qDebug() << "adj_z_in_vseg_ind=" << adj_z_in_vseg_ind;
   qDebug() << "adj_z_in_color_ind=" << adj_z_in_color_ind;
-  qDebug() << "adj_z_bit_pos=" << adj_z_bit_val-1 ;
+  qDebug() << "adj_z_bit_pos=" << adj_z_bit_pos ;
   qDebug() << "c_byte_value_first" << c_byte_value_first;
   qDebug() << "c_byte_value_second" << c_byte_value_second;
 
@@ -104,7 +128,7 @@ static int vertex_cb_z(p_ply_argument argument) {
   r=qRed(pcolor);
   g=qGreen(pcolor);
   b=qBlue(pcolor);
-  qDebug() << "Old color(RGB) is " << "[" << QString::number(r,2) << "]"  << "[" << g << "]"  << "[" << b << "]" ;
+  qDebug() << "Old color(RGB) is " << "[" << r << "]"  << "[" << g << "]"  << "[" << b << "]" ;
   
   r_o=qRed(pcolor_obverse);
   g_o=qGreen(pcolor_obverse);
@@ -113,15 +137,15 @@ static int vertex_cb_z(p_ply_argument argument) {
 
   switch(adj_z_in_color_ind)
     {
-    case 0: // B
+    case 0: // B up G down
       b |= c_byte_value_first;
-      b_o |= c_byte_value_second;
+      g_o |= c_byte_value_second;
       break;
-    case 1: // R
+    case 1: // R up R down
       r |= c_byte_value_first;
       r_o |= c_byte_value_second;
       break;
-    case 2: // G
+    case 2: // G 
       g |= c_byte_value_first;
       g_o |= c_byte_value_second;
       break;
@@ -189,37 +213,18 @@ int main(int argc, char *argv[])
 	  return(1); 
 	}
     }
-  qDebug() << "Args:";
-  qDebug() << "ply_file " <<  ply_file_name;
-  qDebug() << "ply_xscale " <<  ply_xscale;
-  qDebug() << "ply_yscale " <<  ply_yscale;
-  qDebug() << "ply_zscale " <<  ply_zscale;
-  qDebug() << "ply_xcenter " <<  ply_xcenter;
-  qDebug() << "ply_ycenter " <<  ply_ycenter;
-  qDebug() << "ply_zcenter " <<  ply_zcenter;
-  
-    
+  qDebug() << "Args: "; 
+  QString tmps;
+  for(i=0;i<(unsigned int)arguments.count();i++)
+    {
+      tmps += arguments.at(i);
+      tmps += " ";
+    }
+  qDebug() << tmps;
   XSCL=ply_xscale;
   YSCL=ply_yscale;
   ZSCL=ply_zscale;
   PLYXCENTER=ply_xcenter;
-  PLYYCENTER=ply_ycenter;
-  PLYZCENTER=ply_zcenter;
-  qDebug() << "MAXX=" << MAXX;
-  qDebug() << "MAXY=" << MAXY;
-  qDebug() << "MAXZ=" << MAXZ ;
-  qDebug() << "MAXPERLV=" << MAXPERLV ;
-  qDebug() << "MAXB=" << MAXB;
-  qDebug() << "MIDX=" << MIDX;
-  qDebug() << "MIDY=" << MIDY;
-  qDebug() << "MIDZ=" << MIDZ;
-  qDebug() << "MAXIM=" << MAXIM;
-  qDebug() << "XSCL=" << XSCL;
-  qDebug() << "YSCL=" << YSCL;
-  qDebug() << "ZSCL=" << ZSCL;
-  qDebug() << "PLYXCENTER" << PLYXCENTER;
-  qDebug() << "PLYYCENTER" << PLYYCENTER;
-  qDebug() << "PLYZCENTER" << PLYZCENTER;
   PLYYCENTER=ply_ycenter;
   PLYZCENTER=ply_zcenter;
 
@@ -286,7 +291,15 @@ int main(int argc, char *argv[])
       return 1;
     } 
   qDebug() << "Wrote " << fname;
-  
+  // write out a file containing our arguments
+  fname=dirname;
+  fname+="/";
+  fname+=dirname;
+  fname+="_args.txt";
+  QFile f(fname);
+  f.open(QIODevice::WriteOnly);
+  f.write(tmps.toStdString().c_str());
+  f.close();
   return 0;
 }
 
