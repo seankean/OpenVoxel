@@ -100,8 +100,8 @@ void Widget::paintEvent(QPaintEvent *)
 {
   int drawmax=  m_max_time * 60;
 
-  int rotSpeed = 10;//for the bunny
-  int rotAngle = 1;//for the bunny
+  int rotSpeed = 8;//for the bunny
+  int rotAngle = 3;//for the bunny
 
   QString c;
   QPainter painter(this);
@@ -131,16 +131,15 @@ void Widget::paintEvent(QPaintEvent *)
 	    {
 	      //wait till we're ready...
 
-	      if (i%4==0)
-		Txoff=1;
-	      else
-		Txoff=0;
+			  if (i%4==0)
+			Txoff=1;
+			  else
+			Txoff=0;
 
-	      while( (m_timespent->elapsed()) < (16+Txoff) )
-		{
-		  m_total=m_total; // do nothing
-		  Helper::msleep(2);
-		}
+			  while( (m_timespent->elapsed()) < (16+Txoff) )
+			{
+			  m_total=m_total; // do nothing
+			}
 	    }
 	  qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
 	  qDebug() << "painting level: " << m_current; 
@@ -161,15 +160,16 @@ void Widget::paintEvent(QPaintEvent *)
 	  m_total++;
 	  
 	  if(m_current > (m_num_images-1) )
-	    {
-	      m_current = m_num_images-1;
-	      m_direction = -m_direction;
-	    }
+		{
+			m_current = 0;
+			//m_direction = -m_direction;
+		}
+		/*
 	  else if(m_current < 0)
 	    {
 	      m_current = 0;
 	      m_direction = -m_direction;
-	    }
+	    }*/
 
 		//this section is just a hack for the rotating bunny
 		//comment out if you're using it

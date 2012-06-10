@@ -1,5 +1,6 @@
 #include "config.h" // Xplatform specific includes should go in config.h 
 #include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
 #include <QDebug>
 #include "widget.h"
 #include "qextserialport.h"
@@ -26,7 +27,7 @@ void dump_args()
 	qDebug() << "delay_before " << delay_before;
 	qDebug() << "delay_after " << delay_after;
 	qDebug() << "max_time " << max_time;
-	qDebug() << "rotate " << rotate ;
+	qDebug() << "rotate " << rotate;
 	qDebug() << "num_images " << num_images;
 	qDebug() << "interlace_levels " << interlace_levels;
 	qDebug() << "fullscreen " << fullscreen;
@@ -58,6 +59,7 @@ void usage()
 		<< "--delay_before \t<msecond delay before images are rendered> (Default is 0) " << std::endl
 		<< "--delay_after \t<msecond delay after images are rendered>" << std::endl
 		<< "--max_time \t<time in seconds to run>" << std::endl
+		<< "--display \t<number of the display to use (Default = 0)>" << std::endl
 		<< "--rotate \t<rotate the image around>" << std::endl;
 
 }
@@ -73,6 +75,8 @@ int main(int argc, char *argv[])
 
 
 	QStringList arguments = a.arguments();
+	
+	QRect screenres(0,0,0,0);
 
 	for(int i=1; i<arguments.count(); ++i)
 	{
@@ -116,6 +120,10 @@ int main(int argc, char *argv[])
 		{
 			delay_after = arguments.at(++i).toInt();
 		}
+		else if(arguments.at(i) == "--display")
+		{
+			screenres = QApplication::desktop()->screenGeometry(arguments.at(++i).toInt());
+		}
 		else if(arguments.at(i) == "--num_images")
 		{
 			num_images = arguments.at(++i).toInt();
@@ -140,7 +148,11 @@ int main(int argc, char *argv[])
 	QGLFormat *format = new QGLFormat(QGL::SampleBuffers);
 	format->setSwapInterval(1); // vsync
 	Widget w(delay_before, delay_after, max_time, num_images,&serial_device,&camera_ip,&image_prefix,interlace_levels,numbers,0,format, rotate);
+	
+	w.move(QPoint(screenres.x(), screenres.y()));
+	
 	w.resize(608,684);
+	
 	if(fullscreen)
 		w.showFullScreen();
 	else
