@@ -8,8 +8,9 @@
 #include <QDir>
 #include "../display_tool/3rdparty/rply-1.1.1/rply.h"
 #include <math.h>
-double Z=0.0,X=0.0,Y=0.0;
 
+
+static double Z=0.0,X=0.0,Y=0.0;
 static unsigned int MAXX=608;
 static unsigned int MAXY=684;
 static unsigned int MAXZ = 72;
@@ -20,18 +21,20 @@ static unsigned int MIDY=MAXY/2;
 static unsigned int MIDZ=MAXZ/2;
 static unsigned int MAXIM=MAXZ/MAXPERLV;
 static unsigned int MAXBITPERCOLOR=8;
-static double XSCL=1000.0;
-static double YSCL=1000.0;
-static double ZSCL=100.0;
-static int  PLYXCENTER=0;
-static int  PLYYCENTER=0;
-static int  PLYZCENTER=0;
+static double XSCALE=0;
+static double YSCALE=0;
+static double ZSCALE=0;
+static double XOFFSET=0;
+static double YOFFSET=0;
+static double ZOFFSET=0;
 static bool swapYZ=false;
 static bool swapXY=false;
 static bool swapXZ=false;
-static double t=0;
-
-
+static bool flipX=false;
+static bool flipY=false;
+static bool flipZ=true;
+static double zoom=0.99;
+static bool fit=true;
 QImage imlist[3];
 QImage imlist_obverse[3];
 
@@ -59,41 +62,61 @@ static int vertex_cb_z(p_ply_argument argument) {
   Z=ply_get_argument_value(argument);
 
   // we should have eveyone for this line as we have Z called last for each line...
-  // scale and add our center to the value...
 
-  if(swapYZ==true)
+	
+
+  // swap
+
+  double TXSCALE=XSCALE;
+  double TXOFFSET=XOFFSET;
+  double TYSCALE=YSCALE;
+  double TYOFFSET=YOFFSET;
+  double TZSCALE=ZSCALE;
+  double TZOFFSET=ZOFFSET;
+  // guess program uses this order so we must as well
+
+
+  if(swapYZ)
     {
-      t=Y;
-      Y=Z;
-      Z=t;
-      qDebug() << "Swapping Z and Y before scaling";
-      qDebug() << "New Z " << Z << " New Y " << Y;
+      std::swap(Y,Z);
+      std::swap(TYSCALE,TZSCALE);
+      std::swap(TYOFFSET,TZOFFSET);
+    }
+  if(swapXZ)
+    {
+      std::swap(X,Z);
+      std::swap(TXSCALE,TZSCALE);
+      std::swap(TXOFFSET,TZOFFSET);
+    }
+  if(swapXY)
+    {
+      std::swap(X,Y);
+      std::swap(TXSCALE,TYSCALE);
+      std::swap(TXOFFSET,TYOFFSET);
     }
 
-  if(swapXY==true)
-    {
-      t=Y;
-      Y=X;
-      X=t;
-      qDebug() << "Swapping Z and Y before scaling";
-      qDebug() << "New Z " << Z << " New Y " << Y;
-    }
-
+  //scale
   qDebug() << "Before scaling: \tX " << X << " Y " << Y << " Z " << Z;
+ 
   int x=0,y=0,z=0;
-  double Xs = ((XSCL*X)+MIDX+PLYXCENTER);
-  double Ys = ((YSCL*Y)+MIDY+PLYYCENTER);
-  double Zs = ((ZSCL*Z)+MIDZ+PLYZCENTER);
+  double Xs = ((TXSCALE* X))*zoom;
+  double Ys = ((TYSCALE * Y))*zoom;
+  double Zs = ((TZSCALE* Z))*zoom;
+
   qDebug() << "After scaling:    \tXs " << Xs << " Ys " << Ys << " Zs " << Zs;
 
+  Xs+=(TXOFFSET*zoom);
+  Ys+=(TYOFFSET*zoom);
+  Zs+=(TZOFFSET*zoom);
+
   x = (int)Xs;
-  y = ( int)Ys;
+  y = ( int)Ys; //(fudgefactor)
   z = ( int)Zs;
-  
+
   qDebug() << "After assigning to int: x " << x << " y " << y << " z " << z;
   
   // keep these values in range 1 to (MAX+1)
-  if(  x<1 || y<1 || z<1 || x > (int)(MAXX+1) || y >= (int)(MAXY+1) || z>= (int)(MAXZ+1) )
+  if(  x<1 || y<1 || z<1 || x > (int)(MAXX+1) || y > (int)(MAXY+1) || z> (int)(MAXZ+1) )
     {
       qDebug() << "Out of Range!!!";
       return 1;
@@ -104,18 +127,12 @@ static int vertex_cb_z(p_ply_argument argument) {
   z--;
 
   // reverse Z
-  z=71-z;
-
-  // Example for z=40(41):
-  // bmp_ind=(unsigned int)(z/MAXPERLV):bmp_ind=(int)(40/MAXPERLV) = 1.66 = 1 which is the middle image set.
-  // adj_z_in_vseg_ind=(unsigned int)(z-(bmp_ind*MAXPERLV)): (unsigned int)(40-(1*24)) = 16 which is the (top,last,pos) for R
-  // adj_z_in_color_ind=(unsigned int)(MAXPERLVL/adj_z_in_vseg_ind): (24/16) = 1.5 = 1 [0,1,2] = Red
-  // adj_z__bit_val=(unsigned int)adj_z_in_vseg_ind-(int(adj_z_in_color_ind*MAXBITPERCOLOR)): 16-(int(1*8)) = 8 = bit [7](8)
-  // the bit position is position 8[7] aand the color is red and the image is the middle.
-  // first image paint is the byte-compliment of the value/vs the index.  Second image paint is the normal byte value.
-
-  // c_byte_value_first = pow(2,(adj_z__bit_val-1)) 
-  // c_byte_value_second = pow(2,(8-(adj_z__bit_val-1))) the first bit[7] becomes bit[1] the second time.  
+  if(flipX)
+    x=(MAXX-1)-x;
+  if(flipY)
+    y=(MAXY-1)-y;
+  if(flipZ)
+    z=(MAXZ-1)-z;
 
   
   unsigned int bmp_ind=(unsigned int)(z/MAXPERLV);  
@@ -123,7 +140,7 @@ static int vertex_cb_z(p_ply_argument argument) {
   unsigned int adj_z_in_color_ind=(unsigned int)(adj_z_in_vseg_ind/MAXBITPERCOLOR); 
   unsigned int adj_z_bit_pos=(unsigned int)adj_z_in_vseg_ind-(adj_z_in_color_ind*MAXBITPERCOLOR);
   unsigned int c_byte_value_first = (unsigned int)pow(2,(adj_z_bit_pos)) ;
-  unsigned int c_byte_value_second = (unsigned int)pow(2,(8-(adj_z_bit_pos))); // the first bit[7] becomes bit[1] the second time.  
+  unsigned int c_byte_value_second = (unsigned int)pow(2,(MAXBITPERCOLOR-(adj_z_bit_pos))); // the first bit[7] becomes bit[1] the second time.  
     
     
   qDebug() << "x=" << x << " y=" << y << " z=" << z;
@@ -182,16 +199,16 @@ static int vertex_cb_z(p_ply_argument argument) {
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
-  QImage im(608,684,QImage::Format_RGB32);
+  QImage im(MAXX,MAXY,QImage::Format_RGB32);
   unsigned int i=0;
-  QString ply_file_name="./bunny.ply";
+  QString ply_file_name="";
   QStringList arguments = a.arguments();
-  int ply_xscale=1000;
-  int ply_yscale=1000;
-  int ply_zscale=1000;
-  int ply_xcenter=0;
-  int ply_ycenter=0;
-  int ply_zcenter=0;
+  double ply_xscale=0;
+  double ply_yscale=0;
+  double ply_zscale=0;
+  double xoffset=0;
+  double yoffset=0;
+  double zoffset=0;
  
   for(i=1;i <((unsigned int) (arguments.count())); ++i)
     {
@@ -199,27 +216,27 @@ int main(int argc, char *argv[])
 	ply_file_name = arguments.at(++i);
       else if(arguments.at(i) == "--xscale")
 	{
-	  ply_xscale = arguments.at(++i).toInt();
+	  ply_xscale = arguments.at(++i).toDouble();
 	}
       else if(arguments.at(i) == "--yscale")
 	{
-	  ply_yscale = arguments.at(++i).toInt();
+	  ply_yscale = arguments.at(++i).toDouble();
 	}
       else if(arguments.at(i) == "--zscale")
 	{
-	  ply_zscale = arguments.at(++i).toInt();
+	  ply_zscale = arguments.at(++i).toDouble();
 	}
-      else if(arguments.at(i) == "--ply_xcenter")
+      else if(arguments.at(i) == "--xoffset")
 	{
-	  ply_xcenter = arguments.at(++i).toInt();
+	  xoffset = arguments.at(++i).toDouble();
 	}
-      else if(arguments.at(i) == "--ply_ycenter")
+      else if(arguments.at(i) == "--yoffset")
 	{
-	  ply_ycenter = arguments.at(++i).toInt();
+	  yoffset = arguments.at(++i).toDouble();
 	}
-      else if(arguments.at(i) == "--ply_zcenter")
+      else if(arguments.at(i) == "--zoffset")
 	{
-	  ply_zcenter = arguments.at(++i).toInt();
+	  zoffset = arguments.at(++i).toDouble();
 	}
       else if(arguments.at(i) == "--swapXY")
 	{
@@ -232,6 +249,27 @@ int main(int argc, char *argv[])
       else if(arguments.at(i) == "--swapYZ")
 	{
 	  swapYZ=true;
+	}
+      else if(arguments.at(i) == "--flipX")
+	{
+	  flipX=true;
+	}
+      else if(arguments.at(i) == "--flipY")
+	{
+	  flipY=true;
+	}
+      else if(arguments.at(i) == "--flipZ")
+	{
+	  flipZ=true;
+	}
+      else if(arguments.at(i) == "--fit")
+	{
+	  fit=true;
+	  MAXY=MAXX;
+	}
+      else if(arguments.at(i) == "--zoom")
+	{
+	  zoom = arguments.at(++i).toDouble();
 	}
       else
 	{
@@ -248,13 +286,31 @@ int main(int argc, char *argv[])
       tmps += " ";
     }
   qDebug() << tmps;
-  XSCL=ply_xscale;
-  YSCL=ply_yscale;
-  ZSCL=ply_zscale;
-  PLYXCENTER=ply_xcenter;
-  PLYYCENTER=ply_ycenter;
-  PLYZCENTER=ply_zcenter;
+  XSCALE=ply_xscale;
+  YSCALE=ply_yscale;
+  ZSCALE=ply_zscale;
+  XOFFSET=xoffset;
+  YOFFSET=yoffset;
+  ZOFFSET=zoffset;
 
+  
+  if(swapYZ)
+    {
+      qDebug() << "Swapping Y and Z before scaling";
+      std::swap(flipY,flipZ);
+    }
+  if(swapXZ)
+    {
+      qDebug() << "Swapping X and Z before scaling";
+      std::swap(flipX,flipZ);
+    }
+  if(swapXY)
+    {
+      qDebug() << "Swapping X and Y before scaling";
+      std::swap(flipY,flipY);
+    }
+  
+  
   for(i=0;i<MAXIM;i++)
     {
       imlist[i] = im.convertToFormat(QImage::Format_RGB32);
@@ -322,7 +378,7 @@ int main(int argc, char *argv[])
   fname=dirname;
   fname+="/";
   fname+=dirname;
-  fname+="_args.txt";
+  fname+="_ply2vxbx_args.txt";
   QFile f(fname);
   f.open(QIODevice::WriteOnly);
   f.write(tmps.toStdString().c_str());

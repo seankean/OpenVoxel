@@ -24,5 +24,6 @@ OTHER_FILES += \
 USER_MANUAL.txt
 
 CONFIG += \
-debug \
+#debug \
+release \
 console 
