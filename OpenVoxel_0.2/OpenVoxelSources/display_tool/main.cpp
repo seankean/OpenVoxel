@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 	QStringList arguments = a.arguments();
 	
 	QRect screenres(0,0,0,0);
-
+	bool screenres_set=false;
 	for(int i=1; i<arguments.count(); ++i)
 	{
 		if(arguments.at(i) == "--serial_device")
@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
 		else if(arguments.at(i) == "--display")
 		{
 			screenres = QApplication::desktop()->screenGeometry(arguments.at(++i).toInt());
+			screenres_set=true;
 		}
 		else if(arguments.at(i) == "--num_images")
 		{
@@ -149,7 +150,8 @@ int main(int argc, char *argv[])
 	format->setSwapInterval(1); // vsync
 	Widget w(delay_before, delay_after, max_time, num_images,&serial_device,&camera_ip,&image_prefix,interlace_levels,numbers,0,format, rotate);
 	
-	w.move(QPoint(screenres.x(), screenres.y()));
+	if(screenres_set)
+	  w.move(QPoint(screenres.x(), screenres.y()));
 	
 	w.resize(608,684);
 	
