@@ -15,30 +15,74 @@ static unsigned int MAXX=608;
 static unsigned int MAXY=684;
 static unsigned int MAXZ = 72;
 static unsigned int MAXPERLV = 24;
-static unsigned int MAXB=MAXX*MAXY;
-static unsigned int MIDX=MAXX/2;
-static unsigned int MIDY=MAXY/2;
-static unsigned int MIDZ=MAXZ/2;
 static unsigned int MAXIM=MAXZ/MAXPERLV;
 static unsigned int MAXBITPERCOLOR=8;
-static double XSCALE=0;
-static double YSCALE=0;
-static double ZSCALE=0;
-static double XOFFSET=0;
-static double YOFFSET=0;
-static double ZOFFSET=0;
+static double XSCL=0;
+static double YSCL=0;
+static double ZSCL=0;
+static double XLO=0;
+static double YLO=0;
+static double ZLO=0;
+static double XHI=0;
+static double YHI=0;
+static double ZHI=0;
 static bool swapYZ=false;
 static bool swapXY=false;
 static bool swapXZ=false;
 static bool flipX=false;
 static bool flipY=false;
-static bool flipZ=true;
-static double zoom=0.99;
-static bool fit=true;
+static bool flipZ=false;
+static bool fit=false;
 QImage imlist[3];
 QImage imlist_obverse[3];
 
-unsigned int **list;
+
+
+static int scale_vertex_cb_x(p_ply_argument argument) {
+  long eol;
+  ply_get_argument_user_data(argument, NULL, &eol);
+  X=ply_get_argument_value(argument);
+  return 1;
+}
+
+static int scale_vertex_cb_y(p_ply_argument argument) {
+  long eol;
+  ply_get_argument_user_data(argument, NULL, &eol);
+  Y=ply_get_argument_value(argument);
+  return 1;
+}
+
+
+static int scale_vertex_cb_z(p_ply_argument argument) {
+  long eol;
+  ply_get_argument_user_data(argument, NULL, &eol);
+  Z=ply_get_argument_value(argument);
+
+  // all loaded - do All the swapping
+
+  if(swapYZ)
+    {
+      std::swap(Y,Z);
+    }
+  if(swapXZ)
+    {
+      std::swap(X,Z);
+    }
+  if(swapXY)
+    {
+      std::swap(Y,X);
+    }
+
+  XHI=std::max(XHI,X);
+  XLO=std::min(XLO,X);
+  YHI=std::max(YHI,Y);
+  YLO=std::min(YLO,Y);
+  ZHI=std::max(ZHI,Z);
+  ZLO=std::min(ZLO,Z);
+
+
+  return 1;
+}
 
 static int vertex_cb_x(p_ply_argument argument) {
   long eol;
@@ -60,65 +104,44 @@ static int vertex_cb_z(p_ply_argument argument) {
   long eol;
   ply_get_argument_user_data(argument, NULL, &eol);
   Z=ply_get_argument_value(argument);
-
+  
   // we should have eveyone for this line as we have Z called last for each line...
-
-	
-
-  // swap
-
-  double TXSCALE=XSCALE;
-  double TXOFFSET=XOFFSET;
-  double TYSCALE=YSCALE;
-  double TYOFFSET=YOFFSET;
-  double TZSCALE=ZSCALE;
-  double TZOFFSET=ZOFFSET;
-  // guess program uses this order so we must as well
-
-
+  // we have already swapped HI LO  so just swap the othervalues
   if(swapYZ)
     {
       std::swap(Y,Z);
-      std::swap(TYSCALE,TZSCALE);
-      std::swap(TYOFFSET,TZOFFSET);
-    }
+      }
   if(swapXZ)
     {
       std::swap(X,Z);
-      std::swap(TXSCALE,TZSCALE);
-      std::swap(TXOFFSET,TZOFFSET);
-    }
+      }
   if(swapXY)
     {
-      std::swap(X,Y);
-      std::swap(TXSCALE,TYSCALE);
-      std::swap(TXOFFSET,TYOFFSET);
+      std::swap(Y,X);
     }
-
+  
   //scale
-  qDebug() << "Before scaling: \tX " << X << " Y " << Y << " Z " << Z;
- 
+  // qDebug() << "Before scaling: \tX " << X << " Y " << Y << " Z " << Z;
+  
   int x=0,y=0,z=0;
-  double Xs = ((TXSCALE* X))*zoom;
-  double Ys = ((TYSCALE * Y))*zoom;
-  double Zs = ((TZSCALE* Z))*zoom;
+  
 
-  qDebug() << "After scaling:    \tXs " << Xs << " Ys " << Ys << " Zs " << Zs;
+  double Xs = XSCL * (X-XLO);
+  double Ys = YSCL * (Y-YLO);
+  double Zs = ZSCL * (Z-ZLO);
 
-  Xs+=(TXOFFSET*zoom);
-  Ys+=(TYOFFSET*zoom);
-  Zs+=(TZOFFSET*zoom);
-
+  // qDebug() << "After scaling:    \tXs " << Xs << " Ys " << Ys << " Zs " << Zs;
+  
   x = (int)Xs;
-  y = ( int)Ys; //(fudgefactor)
+  y = ( int)Ys;
   z = ( int)Zs;
-
-  qDebug() << "After assigning to int: x " << x << " y " << y << " z " << z;
+  
+  // qDebug() << "After assigning to int: x " << x << " y " << y << " z " << z;
   
   // keep these values in range 1 to (MAX+1)
-  if(  x<1 || y<1 || z<1 || x > (int)(MAXX+1) || y > (int)(MAXY+1) || z> (int)(MAXZ+1) )
+  if(  x<1 || y<1 || z<1 ||  x > (int)(MAXX) || y > (int)(MAXY) ||  z> (int)(MAXZ) )
     {
-      qDebug() << "Out of Range!!!";
+      // qDebug() << "Out of Range!!!";
       return 1;
     }
   // now make them all zero based indexes
@@ -141,15 +164,15 @@ static int vertex_cb_z(p_ply_argument argument) {
   unsigned int adj_z_bit_pos=(unsigned int)adj_z_in_vseg_ind-(adj_z_in_color_ind*MAXBITPERCOLOR);
   unsigned int c_byte_value_first = (unsigned int)pow(2,(adj_z_bit_pos)) ;
   unsigned int c_byte_value_second = (unsigned int)pow(2,(MAXBITPERCOLOR-(adj_z_bit_pos))); // the first bit[7] becomes bit[1] the second time.  
+  
     
-    
-  qDebug() << "x=" << x << " y=" << y << " z=" << z;
-  qDebug() << " bmp_ind="  << bmp_ind;
-  qDebug() << "adj_z_in_vseg_ind=" << adj_z_in_vseg_ind;
-  qDebug() << "adj_z_in_color_ind=" << adj_z_in_color_ind;
-  qDebug() << "adj_z_bit_pos=" << adj_z_bit_pos ;
-  qDebug() << "c_byte_value_first" << c_byte_value_first;
-  qDebug() << "c_byte_value_second" << c_byte_value_second;
+  // qDebug() << "x=" << x << " y=" << y << " z=" << z;
+  // qDebug() << " bmp_ind="  << bmp_ind;
+  // qDebug() << "adj_z_in_vseg_ind=" << adj_z_in_vseg_ind;
+  // qDebug() << "adj_z_in_color_ind=" << adj_z_in_color_ind;
+  // qDebug() << "adj_z_bit_pos=" << adj_z_bit_pos ;
+  // qDebug() << "c_byte_value_first" << c_byte_value_first;
+  // qDebug() << "c_byte_value_second" << c_byte_value_second;
 
   QPoint ploc( x, y );
   QRgb pcolor=imlist[bmp_ind].pixel(ploc);
@@ -160,12 +183,12 @@ static int vertex_cb_z(p_ply_argument argument) {
   r=qRed(pcolor);
   g=qGreen(pcolor);
   b=qBlue(pcolor);
-  qDebug() << "Old color(RGB) is " << "[" << r << "]"  << "[" << g << "]"  << "[" << b << "]" ;
+  // qDebug() << "Old color(RGB) is " << "[" << r << "]"  << "[" << g << "]"  << "[" << b << "]" ;
   
   r_o=qRed(pcolor_obverse);
   g_o=qGreen(pcolor_obverse);
   b_o=qBlue(pcolor_obverse);
-  qDebug() << "Old color(RGB) Obverse  is " << "[" << r_o << "]"  << "[" << g_o << "]"  << "[" << b_o << "]" ;
+  // qDebug() << "Old color(RGB) Obverse  is " << "[" << r_o << "]"  << "[" << g_o << "]"  << "[" << b_o << "]" ;
 
   switch(adj_z_in_color_ind)
     {
@@ -182,207 +205,249 @@ static int vertex_cb_z(p_ply_argument argument) {
       g_o |= c_byte_value_second;
       break;
     default:
-      qDebug() << "BAD COLOR IND";
+      // qDebug() << "BAD COLOR IND";
       return 1;
     }
 
   pcolor=qRgb(r,g,b);
   imlist[bmp_ind].setPixel(QPoint(x,y),pcolor);
-  qDebug() << "New color(RGB) is " << "[" << r << "]"  << "[" << g << "]"  << "[" << b << "]" ;
+  // qDebug() << "New color(RGB) is " << "[" << r << "]"  << "[" << g << "]"  << "[" << b << "]" ;
   pcolor_obverse=qRgb(r_o,g_o,b_o);
   imlist_obverse[bmp_ind].setPixel(QPoint(x,y),pcolor_obverse);
-  qDebug() << "New color(RGB)_obverse is " << "[" << r_o << "]"  << "[" << g_o << "]"  << "[" << b_o << "]" ;
+  // qDebug() << "New color(RGB)_obverse is " << "[" << r_o << "]"  << "[" << g_o << "]"  << "[" << b_o << "]" ;
 
   return 1;
 }
+
+
+
+
 
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
   QImage im(MAXX,MAXY,QImage::Format_RGB32);
   unsigned int i=0;
+  QString ply_file_list_name="";
   QString ply_file_name="";
   QStringList arguments = a.arguments();
-  double ply_xscale=0;
-  double ply_yscale=0;
-  double ply_zscale=0;
-  double xoffset=0;
-  double yoffset=0;
-  double zoffset=0;
- 
+  
   for(i=1;i <((unsigned int) (arguments.count())); ++i)
     {
-      if(arguments.at(i) == "--ply_file")
-	ply_file_name = arguments.at(++i);
-      else if(arguments.at(i) == "--xscale")
-	{
-	  ply_xscale = arguments.at(++i).toDouble();
-	}
-      else if(arguments.at(i) == "--yscale")
-	{
-	  ply_yscale = arguments.at(++i).toDouble();
-	}
-      else if(arguments.at(i) == "--zscale")
-	{
-	  ply_zscale = arguments.at(++i).toDouble();
-	}
-      else if(arguments.at(i) == "--xoffset")
-	{
-	  xoffset = arguments.at(++i).toDouble();
-	}
-      else if(arguments.at(i) == "--yoffset")
-	{
-	  yoffset = arguments.at(++i).toDouble();
-	}
-      else if(arguments.at(i) == "--zoffset")
-	{
-	  zoffset = arguments.at(++i).toDouble();
-	}
-      else if(arguments.at(i) == "--swapXY")
-	{
-	  swapXY=true;
-	}
-      else if(arguments.at(i) == "--swapXZ")
-	{
-	  swapXZ=true;
-	}
-      else if(arguments.at(i) == "--swapYZ")
-	{
-	  swapYZ=true;
-	}
-      else if(arguments.at(i) == "--flipX")
-	{
-	  flipX=true;
-	}
-      else if(arguments.at(i) == "--flipY")
-	{
-	  flipY=true;
-	}
-      else if(arguments.at(i) == "--flipZ")
-	{
-	  flipZ=true;
-	}
-      else if(arguments.at(i) == "--fit")
-	{
-	  fit=true;
-	  MAXY=MAXX;
-	}
-      else if(arguments.at(i) == "--zoom")
-	{
-	  zoom = arguments.at(++i).toDouble();
-	}
+      if(arguments.at(i) == "--ply_file_list")
+	ply_file_list_name = arguments.at(++i);
       else
 	{
 	  qDebug() << arguments.at(i) << "-INVALID ARG";
 	  qDebug() << "Args:" << arguments;;
-	  return(1); 
+	  std::exit(1); 
 	}
     }
-  qDebug() << "Args: "; 
+  
+  // qDebug() << "Args: "; 
   QString tmps;
   for(i=0;i<(unsigned int)arguments.count();i++)
     {
       tmps += arguments.at(i);
       tmps += " ";
     }
-  qDebug() << tmps;
-  XSCALE=ply_xscale;
-  YSCALE=ply_yscale;
-  ZSCALE=ply_zscale;
-  XOFFSET=xoffset;
-  YOFFSET=yoffset;
-  ZOFFSET=zoffset;
 
-  
-  if(swapYZ)
+  // qDebug() << tmps;
+
+  // qDebug() <<  "ply_file_list_name" << ply_file_list_name;
+  QFile flist;
+  flist.setFileName(ply_file_list_name);
+
+  if(!flist.open(QIODevice::ReadOnly))
     {
-      qDebug() << "Swapping Y and Z before scaling";
-      std::swap(flipY,flipZ);
-    }
-  if(swapXZ)
-    {
-      qDebug() << "Swapping X and Z before scaling";
-      std::swap(flipX,flipZ);
-    }
-  if(swapXY)
-    {
-      qDebug() << "Swapping X and Y before scaling";
-      std::swap(flipY,flipY);
+      qDebug() << "Couldn't open ply_file_list " << ply_file_list_name;
+      std::exit(1);
     }
   
-  
-  for(i=0;i<MAXIM;i++)
-    {
-      imlist[i] = im.convertToFormat(QImage::Format_RGB32);
-      imlist_obverse[i] = im.convertToFormat(QImage::Format_RGB32);
-    }
-  p_ply ply = ply_open(ply_file_name.toStdString().c_str(), NULL, 0, NULL);
-  if (!ply) return 1;
-  if (!ply_read_header(ply)) return 1;
-  
-  ply_set_read_cb(ply, "vertex", "x", vertex_cb_x, NULL, 0);
-  ply_set_read_cb(ply, "vertex", "y", vertex_cb_y, NULL, 1);
-  ply_set_read_cb(ply, "vertex", "z", vertex_cb_z, NULL, 2);
-  if (!ply_read(ply)) 
-    return 1;
-  ply_close(ply);
-  qDebug() << "After ply read";
+  p_ply ply; 
   QImage tmp;
-  QString fname;
-  QString dirname( (QFileInfo(ply_file_name).baseName()) );
-   QDir qd;
-  qd.mkdir(dirname);
-  qd.cd(dirname);
+  QString fname,ts;
+  QString dirname;
+  QStringList line_args;
+  QDir qd;
+  unsigned int j;
+  QFile f;
+  char *list_line = new char[1000];
+  while(!flist.atEnd())
+    {
+      XSCL=0;
+      YSCL=0;
+      ZSCL=0;
+      XLO=0;
+      YLO=0;
+      ZLO=0;
+      XHI=0;
+      YHI=0;
+      ZHI=0;
+      swapYZ=false;
+      swapXY=false;
+      swapXZ=false;
+      flipX=false;
+      flipY=false;
+      flipZ=false;
+      fit=false;
+
+      flist.readLine(list_line,1000);
+      ts=list_line;
+      ts.remove(QRegExp("\n"));
+      line_args=QStringList(ts.split(" "));
+      // qDebug() << "ts " << ts << "line_args" << line_args << "line args count" << line_args.count();
+      for(i=0;i <((unsigned int) (line_args.count()-1)); i++)
+	{
+	  // qDebug() << "arg: " << line_args.at(i);
+
+	  if(line_args.at(i) == "--ply_file")
+	    {
+	      // qDebug() << "Got the name"  ;
+	      ply_file_name = line_args.at(++i);
+	    }
+	  else if(line_args.at(i) == "--swapXY")
+	    {
+	      swapXY=true;
+	    }
+	  else if(line_args.at(i) == "--swapXZ")
+	    {
+	      swapXZ=true;
+	    }
+	  else if(line_args.at(i) == "--swapYZ")
+	    {
+	      swapYZ=true;
+	    }
+	  else if(line_args.at(i) == "--flipX")
+	    {
+	      flipX=true;
+	    }
+	  else if(line_args.at(i) == "--flipY")
+	    {
+	      flipY=true;
+	    }
+	  else if(line_args.at(i) == "--flipZ")
+	    {
+	      flipZ=true;
+	    }
+	  else
+	    {
+	      qDebug() << line_args.at(i) << "-INVALID ARG LINE ";
+	      qDebug() << "Args:" << line_args;;
+	      std::exit(1) ;
+	    }
+	}
+
+
+
+      ply = ply_open(ply_file_name.toStdString().c_str(), NULL, 0, NULL);
+      if (!ply) 
+	{
+	   qDebug() << "Couldn't open " << ply_file_name;
+	  std::exit(1);
+	}
+      if (!ply_read_header(ply)) std::exit(1);
   
-  for(unsigned int j=0;j<MAXIM;j++)
-    {
-      fname=dirname;
-      fname+=QString("/image%1.bmp").arg(j, 5, 'f', 0, '0');
-      tmp=imlist[j].convertToFormat(QImage::Format_RGB888);
-      if(!tmp.save(fname,"BMP"))
+      ply_set_read_cb(ply, "vertex", "x", scale_vertex_cb_x, NULL, 0);
+      ply_set_read_cb(ply, "vertex", "y", scale_vertex_cb_y, NULL, 1);
+      ply_set_read_cb(ply, "vertex", "z", scale_vertex_cb_z, NULL, 2);
+
+      if (!ply_read(ply)) 
+	std::exit(1);
+      ply_close(ply);
+
+      // qDebug() << "After ply read - ";
+
+      // qDebug() << "Maximums\tXHI " << XHI << " YHI " << YHI << " ZHI " << ZHI;
+      // qDebug() << "Minimums\tXLO " << XLO << " YLO " << YLO << " ZLO " << ZLO;
+
+      XSCL=((double)(MAXX) / (fabs(XHI)+fabs(XLO)));
+      YSCL=((double)(MAXY) / (fabs(YHI)+fabs(YLO)));
+      ZSCL=((double)(MAXZ) / (fabs(ZHI)+fabs(ZLO)));
+
+      // qDebug() << "XSCL " << XSCL << "YSCL " << YSCL << "ZSCL " << ZSCL;
+
+      // qDebug() << "Reading data";
+
+
+      // CREATE THE IMAGES  
+  
+      for(i=0;i<MAXIM;i++)
 	{
-	  qDebug() << "Unable to write " << fname;
-	  return 1;
+	  imlist[i] = im.convertToFormat(QImage::Format_RGB32);
+	  imlist_obverse[i] = im.convertToFormat(QImage::Format_RGB32);
 	}
-      fname=dirname;
-      fname+=QString("/image%1.bmp").arg(6-j, 5, 'f', 0, '0');
-      tmp=imlist_obverse[j].convertToFormat(QImage::Format_RGB888);
-      if(!tmp.save(fname,"BMP"))
+
+      ply = ply_open(ply_file_name.toStdString().c_str(), NULL, 0, NULL);
+      if (!ply) std::exit(1);
+      if (!ply_read_header(ply)) std::exit(1);
+      
+      ply_set_read_cb(ply, "vertex", "x", vertex_cb_x, NULL, 0);
+      ply_set_read_cb(ply, "vertex", "y", vertex_cb_y, NULL, 1);
+      ply_set_read_cb(ply, "vertex", "z", vertex_cb_z, NULL, 2);
+
+      if (!ply_read(ply)) 
+	std::exit(1);
+      ply_close(ply);
+
+      // qDebug() << "After ply read";
+      dirname=QString( (QFileInfo(ply_file_name).baseName()) );
+      qd.mkdir(dirname);
+      qd.cd(dirname);
+      qDebug() << "Creating " << dirname;
+      for(j=0;j<MAXIM;j++)
 	{
-	  qDebug() << "Unable to write " << fname;
-	  return 1;
+	  fname=dirname;
+	  fname+=QString("/image%1.bmp").arg(j, 5, 'f', 0, '0');
+	  tmp=imlist[j].convertToFormat(QImage::Format_RGB888);
+	  if(!tmp.save(fname,"BMP"))
+	    {
+	      // qDebug() << "Unable to write " << fname;
+	      std::exit(1);
+	    }
+	  fname=dirname;
+	  fname+=QString("/image%1.bmp").arg(6-j, 5, 'f', 0, '0');
+	  tmp=imlist_obverse[j].convertToFormat(QImage::Format_RGB888);
+	  if(!tmp.save(fname,"BMP"))
+	    {
+	      // qDebug() << "Unable to write " << fname;
+	      std::exit(1);
+	    }
+	  // qDebug() << "Wrote " << fname;
 	}
-      qDebug() << "Wrote " << fname;
-    }
-  // write out blank ones for 3 and 7
+      // write out blank ones for 3 and 7
  
-  fname=dirname;
-  fname+=QString("/image%1.bmp").arg(3, 5, 'f', 0, '0');
-  tmp=im.convertToFormat(QImage::Format_RGB888);
-  if(!tmp.save(fname,"BMP"))
-    {
-      qDebug() << "Unable to write " << fname;
-      return 1;
+      fname=dirname;
+      fname+=QString("/image%1.bmp").arg(3, 5, 'f', 0, '0');
+      tmp=im.convertToFormat(QImage::Format_RGB888);
+      if(!tmp.save(fname,"BMP"))
+	{
+	  // qDebug() << "Unable to write " << fname;
+	  std::exit(1);
+	}
+      // qDebug() << "Wrote " << fname;
+      fname=dirname;
+      fname+=QString("/image%1.bmp").arg(7, 5, 'f', 0, '0');
+      tmp=im.convertToFormat(QImage::Format_RGB888);
+      if(!tmp.save(fname,"BMP"))
+	{
+	  // qDebug() << "Unable to write " << fname;
+	  std::exit(1);
+	} 
+      //qDebug() << "Wrote " << fname;
+      // write out a file containing our arguments
+      fname=dirname;
+      fname+="/";
+      fname+=dirname;
+      fname+="_ply2vxbx_args.txt";
+      f.setFileName(fname);
+      f.open(QIODevice::WriteOnly);
+      f.write(tmps.toStdString().c_str());
+      f.close();
+      qd.cd("..");
+      qDebug() << "Finished " << dirname;
     }
-  qDebug() << "Wrote " << fname;
-  fname=dirname;
-  fname+=QString("/image%1.bmp").arg(7, 5, 'f', 0, '0');
-  tmp=im.convertToFormat(QImage::Format_RGB888);
-  if(!tmp.save(fname,"BMP"))
-    {
-      qDebug() << "Unable to write " << fname;
-      return 1;
-    } 
-  qDebug() << "Wrote " << fname;
-  // write out a file containing our arguments
-  fname=dirname;
-  fname+="/";
-  fname+=dirname;
-  fname+="_ply2vxbx_args.txt";
-  QFile f(fname);
-  f.open(QIODevice::WriteOnly);
-  f.write(tmps.toStdString().c_str());
-  f.close();
-  return 0;
+  
+  std::exit(0);
 }
 

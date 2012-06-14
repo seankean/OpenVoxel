@@ -20,7 +20,7 @@ public:
 };
 
 
-Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString *image_prefix, bool interlace_levels, bool numbers, QWidget *parent, QGLFormat *format, bool rotate)
+Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString *image_prefix, bool interlace_levels, bool numbers, QWidget *parent, QGLFormat *format, bool rotate, QString *file_list_name)
   :QGLWidget(*format, parent)
   , m_current(0)
   , m_state(Stopped)
@@ -36,6 +36,7 @@ Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, 
   , m_interlace_levels(interlace_levels)
   , m_numbers(numbers)
   , m_rotate(rotate)
+  , m_file_list_name(file_list_name)
 {
   setAutoFillBackground(false);
   makeCurrent();
@@ -84,7 +85,23 @@ Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, 
   //  connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
   //  m_timer->setInterval(50); // times a second we paint drawmax frames 
   QTimer::singleShot(0, this, SLOT(startShow()));
+  // if list then open it
 
+ file_list=false;
+
+
+  if(*m_file_list_name!="")
+    {
+      flist= new QFile();
+      file_list=true;
+      flist->setFileName(*file_list_name);
+      if(!flist->open(QIODevice::ReadOnly))
+	{
+	  qDebug() << "Couldn't open file_list " << *file_list_name;
+	  std::exit(1);
+	}
+      //open 
+    }
 }
 
 Widget::~Widget()
@@ -109,6 +126,8 @@ void Widget::paintEvent(QPaintEvent *)
   QPainter painter(this);
   QThread t(this);
   int Txoff=0,Tyoff=0;
+  char *list_line;
+  list_line = new char [1000];
   if(m_total==0)
     {
       m_timespent->restart();
@@ -116,20 +135,34 @@ void Widget::paintEvent(QPaintEvent *)
   else if (m_total>59)
     {
       m_total=0;
-      qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
+     // qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
     }
   
   for(int i=0;i<drawmax;i++) 
     {
-      tmp=fname;
-      tmp+=QString("%1.bmp").arg(m_current, 5, 'f', 0, '0');
+      if(file_list)
+	{
+	  if(flist->atEnd())
+	    {
+	      flist->close();
+	      flist->open(QIODevice::ReadOnly);
+	    }
+	  flist->readLine(list_line,1000);
+	  tmp=list_line;
+	  tmp.remove(QRegExp("\n"));
+	}
+      else
+	{
+	  tmp=fname;
+	  tmp+=QString("%1.bmp").arg(m_current, 5, 'f', 0, '0');
+	}
       bool ret = m_pixmap[m_current%8].load(tmp);
       if(!ret)
 	{
-	  qDebug() << "FAILED on image:" << m_current << "=" << ret << "EXITING" ;
-	  exit(1);
+	  qDebug() << "FAILED on image:" << m_current << "=" <<  "name= " << tmp << ret << "EXITING" ;
+	  std::exit(1);
 	}
-      qDebug() << "Loading image:" << m_current << "=" << ret;
+     // qDebug() << "Loading image:" << m_current << "=" << ret;
 
       if(m_total>0)
 	{
@@ -145,13 +178,13 @@ void Widget::paintEvent(QPaintEvent *)
 	      Txoff=Txoff;
 	    }
 	}
-      qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-      qDebug() << "painting level: " << m_current; 
+     // qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
+     // qDebug() << "painting level: " << m_current; 
 	  
       c= QString("%1").arg(m_current);
       listener->port->write(qPrintable(c),1);
 	  
-      qDebug() << "Sent to " << *m_serial_device << c << " starting at level " << m_current; 
+     // qDebug() << "Sent to " << *m_serial_device << c << " starting at level " << m_current; 
       qDebug() << "Read from " << *m_serial_device << listener->port->readAll();
 	  
 	  
@@ -181,7 +214,7 @@ void Widget::paintEvent(QPaintEvent *)
       else if (m_total>59)
 	{
 	  m_total=0;
-	  qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
+	 // qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
 	}
     }
   close();

@@ -10,6 +10,7 @@
 QString serial_device = "COM3";
 QString camera_ip = "192.168.1.100:55555"; //????
 QString image_prefix = "testimages/image";
+QString file_list_name="";
 int delay_before = 0;
 int delay_after = 0;
 int num_images = 1;
@@ -31,7 +32,7 @@ void dump_args()
 	qDebug() << "num_images " << num_images;
 	qDebug() << "interlace_levels " << interlace_levels;
 	qDebug() << "fullscreen " << fullscreen;
-	qDebug() << "numbers " << fullscreen;
+	qDebug() << "file_list_name " << file_list_name;
 	
 	//  qDebug() << "colors " << fullscreen;
 }
@@ -49,7 +50,7 @@ void usage()
 		<< "Windows paths should be double backslashes - tarzanimages\\image" << std::endl
 		<< "Usage: " << std::endl
 		<< "--num_images \t<number of image files to read> Required" << std::endl
-		<< "--image_prefix \t<path(s) and alpha filename prefix> (Default is testimages/image)" << std::endl
+		<< "--image_prefix \t<path(s) and alpha filename prefix> (Default is testimages/image) DO NOT USE IF USING FILE LIST" << std::endl
 		<< "--fullscreen \t Enables FullScreen at startup " << std::endl
 		<< "--numbers \t Enables layer numbers at startup " << std::endl
 		<< "--interlace_levels \t Enables interlaced levels drawing every-other frame as follows: " << std::endl
@@ -60,7 +61,7 @@ void usage()
 		<< "--delay_after \t<msecond delay after images are rendered>" << std::endl
 		<< "--max_time \t<time in seconds to run>" << std::endl
 		<< "--display \t<number of the display to use (Default = 0)>" << std::endl
-		<< "--rotate \t<rotate the image around>" << std::endl;
+		<< "--file_list_name \t<file_list.txt> - supply a text file with each line consisting of complete path/name of images in the order to be played.\n\t\t" << std::endl;
 
 }
 
@@ -112,6 +113,10 @@ int main(int argc, char *argv[])
 		{
 			image_prefix = arguments.at(++i);
 		}
+		else if(arguments.at(i) == "--file_list_name")
+		{
+			file_list_name = arguments.at(++i);
+		}
 		else if(arguments.at(i) == "--delay_before")
 		{
 			delay_before = arguments.at(++i).toInt();
@@ -147,7 +152,7 @@ int main(int argc, char *argv[])
 	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
 	QGLFormat *format = new QGLFormat(QGL::SampleBuffers);
 	format->setSwapInterval(1); // vsync
-	Widget w(delay_before, delay_after, max_time, num_images,&serial_device,&camera_ip,&image_prefix,interlace_levels,numbers,0,format, rotate);
+	Widget w(delay_before, delay_after, max_time, num_images,&serial_device,&camera_ip,&image_prefix,interlace_levels,numbers,0,format, rotate,&file_list_name);
 	
 	w.move(QPoint(screenres.x(), screenres.y()));
 	

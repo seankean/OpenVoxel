@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QPointer>
 #include <QElapsedTimer>
+#include <QFile>
 #include "PortListener.h"
 
 class Widget : public QGLWidget
@@ -12,7 +13,7 @@ class Widget : public QGLWidget
   Q_OBJECT
 
 public:
-  explicit Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString * image_prefix, bool interlace_levels, bool numbers,QWidget *parent = 0,QGLFormat *format=0, bool rotate = false);
+  explicit Widget(int delay_before, int delay_after, int max_time, int num_images, QString *serial_device, QString *camera_ip, QString * image_prefix, bool interlace_levels, bool numbers,QWidget *parent = 0,QGLFormat *format=0, bool rotate = false,QString *file_list_name=0);
   ~Widget();
   enum State {Stopped = 0, Drawing, EndOfSet, WaitingAfter};
     
@@ -50,6 +51,10 @@ private:
   int m_curr_angle; 
   unsigned int m_draw_count;
   bool m_rotate; 
+  QString *m_file_list_name;
+  QFile *flist;
+  bool file_list;
+
   qreal aspect,textx,texty;
 private slots:
 
