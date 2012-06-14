@@ -12,10 +12,10 @@ TEMPLATE = app
 
 SOURCES += \
 guess_scale.cpp\
-../display_tool/3rdparty/rply-1.1.1/rply.c
+../../3rdparty/rply-1.1.1/rply.c
 
 HEADERS  += \
-../display_tool/3rdparty/rply-1.1.1/rply.h
+../../3rdparty/rply-1.1.1/rply.h
 
 
 FORMS +=

@@ -28,7 +28,7 @@ FORMS +=
 OTHER_FILES += \
 USER_MANUAL.txt
 
-include(3rdparty/qextserialport-1.2beta1/src/qextserialport.pri)
+include(../../3rdparty/qextserialport-1.2beta1/src/qextserialport.pri)
 
 CONFIG += \
 debug \

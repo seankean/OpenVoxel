@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QDir>
-#include "../display_tool/3rdparty/rply-1.1.1/rply.h"
+#include "../../3rdparty/rply-1.1.1/rply.h"
 #include <math.h>
 
 
