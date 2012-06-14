@@ -1,3 +1,13 @@
+Changed Files:
+
+plytvxbx.cpp
+file_list_test_bunny.txt
+
+Added: --zoom_progressive .01 multiplies the Z value and the parameter to scale the x,y value only...
+
+================================
+
+
 Added --zoom_mid and --zoom_hi to adjust the size of slices that are more distant from the first set.  
 It is a simple multiplier, affecting X,Y only.  Use values under 1.0 to shrink the mid and hi slices. 
 

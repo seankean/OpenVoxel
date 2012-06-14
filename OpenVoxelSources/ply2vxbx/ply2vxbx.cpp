@@ -35,6 +35,7 @@ static bool flipZ=false;
 static bool fit=false;
 static double zoom_mid=0;
 static double zoom_hi=0;
+static double zoom_progressive=0;
 
 QImage imlist[3];
 QImage imlist_obverse[3];
@@ -132,10 +133,10 @@ static int vertex_cb_z(p_ply_argument argument) {
   double Ys = YSCL * (Y-YLO);
   double Zs = ZSCL * (Z-ZLO);
 
-  
-  if( zoom_mid != 0.0 || zoom_hi!=0.0 )
+  int tmpz=0;
+  if( (zoom_mid != 0.0 && zoom_hi !=0.0 ) && zoom_progressive == 0.0)
     {
-      int tmpz=(int)Zs;
+      tmpz=(int)Zs;
       if( tmpz>=1 && tmpz<=(int)MAXZ)
 	{
 	  tmpz--;
@@ -159,6 +160,19 @@ static int vertex_cb_z(p_ply_argument argument) {
 	    default:
 	      break;
 	    }
+	}
+    }
+  else if(zoom_progressive != 0.0)
+    {
+      tmpz=(int)Zs;
+      if( tmpz>=1 && tmpz<=(int)MAXZ)
+	{
+	  tmpz--;
+	  if(flipZ)
+	    tmpz=(MAXZ-1)-tmpz;
+
+	  Xs*=(zoom_progressive*z);
+	  Ys*=(zoom_progressive*z);
 	}
     }
 
@@ -370,6 +384,10 @@ int main(int argc, char *argv[])
 	      zoom_mid = line_args.at(++i).toDouble();
 	    }
 	  else if(line_args.at(i) == "--zoom_hi")
+	    {
+	      zoom_hi = line_args.at(++i).toDouble();
+	    }
+	  else if(line_args.at(i) == "--zoom_progressive")
 	    {
 	      zoom_hi = line_args.at(++i).toDouble();
 	    }
