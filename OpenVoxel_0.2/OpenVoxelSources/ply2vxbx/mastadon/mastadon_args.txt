@@ -1,1 +1,0 @@
-ply2vxbx --ply_file mastadon.ply --xscale 127.323  --xoffset 640.436  --yscale 18.6275  --yoffset 38.8857  --zscale 52.2025  --zoffset 608 --swapXY --swapYZ --fit 2> mastadon.txt

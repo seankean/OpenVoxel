@@ -1,1 +1,0 @@
-./ply2vxbx --ply_file_list file_list_test.txt --swapXY --swapXZ --fit 

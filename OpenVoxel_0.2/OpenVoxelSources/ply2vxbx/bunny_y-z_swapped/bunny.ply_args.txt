@@ -1,1 +1,0 @@
-./ply2vxbx --ply_file ./bunny.ply --xscale 2500 --yscale 2500 --zscale 400 --ply_xcenter 0 --ply_ycenter -200 --ply_zcenter -15 

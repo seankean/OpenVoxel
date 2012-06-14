@@ -1,1 +1,0 @@
-ply2vxbx --ply_file bunny.ply --xscale 4384.53  --xoffset 416.261  --yscale 378.972  --yoffset 1  --zscale 5028.96  --zoffset 312.122 --swapXY --swapYZ --fit 2> bunny.txt

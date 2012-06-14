@@ -1,1 +1,0 @@
-See drawWidget.h for information regarding this library.
