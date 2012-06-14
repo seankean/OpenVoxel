@@ -1,0 +1,4 @@
+--ply_file ./bunny.ply --swapXZ --swapXY --flipZ 
+--ply_file ./bunny2.ply --swapYZ --flipZ 
+--ply_file ./bunny3.ply --swapXZ --flipZ 
+--ply_file ./bunny4.ply --swapXZ --swapYZ --flipZ 
