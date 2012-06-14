@@ -6,7 +6,7 @@
 #include <QStringList>
 #include <QFileInfo>
 #include <QDir>
-#include "../../3rdparty/rply-1.1.1/rply.h"
+#include "../display_tool/3rdparty/rply-1.1.1/rply.h"
 #include <math.h>
 
 
@@ -33,6 +33,9 @@ static bool flipX=false;
 static bool flipY=false;
 static bool flipZ=false;
 static bool fit=false;
+static double zoom_mid=0;
+static double zoom_hi=0;
+
 QImage imlist[3];
 QImage imlist_obverse[3];
 
@@ -119,16 +122,47 @@ static int vertex_cb_z(p_ply_argument argument) {
     {
       std::swap(Y,X);
     }
-  
+
+  int x=0,y=0,z=0;
+
   //scale
   // qDebug() << "Before scaling: \tX " << X << " Y " << Y << " Z " << Z;
   
-  int x=0,y=0,z=0;
-  
-
   double Xs = XSCL * (X-XLO);
   double Ys = YSCL * (Y-YLO);
   double Zs = ZSCL * (Z-ZLO);
+
+  
+  if( zoom_mid != 0.0 || zoom_hi!=0.0 )
+    {
+      int tmpz=(int)Zs;
+      if( tmpz>=1 && tmpz<=(int)MAXZ)
+	{
+	  tmpz--;
+	  if(flipZ)
+	    tmpz=(MAXZ-1)-tmpz;
+	  switch((unsigned int)(z/MAXPERLV))
+	    {
+	    case 0:
+	      // no progressive scaling
+	      break;
+	    case 1:
+	      // apply zoom_mid
+	      Xs*=zoom_mid;
+	      Ys*=zoom_mid;
+	      break;
+	    case 2:
+	      // apply zoom_hi
+	      Xs*=zoom_hi;
+	      Ys*=zoom_hi;
+	      break;
+	    default:
+	      break;
+	    }
+	}
+    }
+
+
 
   // qDebug() << "After scaling:    \tXs " << Xs << " Ys " << Ys << " Zs " << Zs;
   
@@ -138,7 +172,7 @@ static int vertex_cb_z(p_ply_argument argument) {
   
   // qDebug() << "After assigning to int: x " << x << " y " << y << " z " << z;
   
-  // keep these values in range 1 to (MAX+1)
+  // keep these values in range 1 to MAX
   if(  x<1 || y<1 || z<1 ||  x > (int)(MAXX) || y > (int)(MAXY) ||  z> (int)(MAXZ) )
     {
       // qDebug() << "Out of Range!!!";
@@ -239,7 +273,8 @@ int main(int argc, char *argv[])
       else
 	{
 	  qDebug() << arguments.at(i) << "-INVALID ARG";
-	  qDebug() << "Args:" << arguments;;
+	  qDebug() << "Args:" << arguments;
+	  qDebug() << "use --ply_file_list <a file that looks like file_list_test_bunny.txt>";
 	  std::exit(1); 
 	}
     }
@@ -329,6 +364,14 @@ int main(int argc, char *argv[])
 	  else if(line_args.at(i) == "--flipZ")
 	    {
 	      flipZ=true;
+	    }
+	  else if(line_args.at(i) == "--zoom_mid")
+	    {
+	      zoom_mid = line_args.at(++i).toDouble();
+	    }
+	  else if(line_args.at(i) == "--zoom_hi")
+	    {
+	      zoom_hi = line_args.at(++i).toDouble();
 	    }
 	  else
 	    {

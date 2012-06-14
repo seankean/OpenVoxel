@@ -1,3 +1,15 @@
+Added --zoom_mid and --zoom_hi to adjust the size of slices that are more distant from the first set.  
+It is a simple multiplier, affecting X,Y only.  Use values under 1.0 to shrink the mid and hi slices. 
+
+0 and 6 No changes.
+1 and 5 multiply X,Y by --zoom_mid 
+2 and 4 multiply X,Y by --zoom_hi 
+
+
+3 and 7 - (black frames) - unchanged.
+
+==================================
+
 Added file list and scaling logic to ply2vxbx and increased speed dramatically.  Please use this new method
 
 
