@@ -84,7 +84,7 @@ Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, 
   m_timelastdraw= new QElapsedTimer();
   //  connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
   //  m_timer->setInterval(50); // times a second we paint drawmax frames 
-  QTimer::singleShot(0, this, SLOT(startShow()));
+  
   // if list then open it
 
  file_list=false;
@@ -102,6 +102,8 @@ Widget::Widget(int delay_before, int delay_after, int max_time, int num_images, 
 	}
       //open 
     }
+	
+	QTimer::singleShot(0, this, SLOT(startShow()));
 }
 
 Widget::~Widget()
@@ -138,6 +140,7 @@ void Widget::paintEvent(QPaintEvent *)
      // qDebug() << "drew 60 in " << m_timespent->elapsed() << " milliseconds";
     }
   
+int counter = 0;
   for(int i=0;i<drawmax;i++) 
     {
       if(file_list)
@@ -178,34 +181,41 @@ void Widget::paintEvent(QPaintEvent *)
 	      Txoff=Txoff;
 	    }
 	}
+	
+	counter = counter % 8;
+		
+	c= QString("%1").arg(counter);
+	listener->port->write(qPrintable(c),1);
+	qDebug() << "Current c: " << c;
+	qDebug() << "m_current: " << m_current;
+	qDebug() << "counter: " << counter;
+	qDebug() << "Current File: " << tmp;
+	qDebug() << "\n";
      // qDebug() << "START:" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-     // qDebug() << "painting level: " << m_current; 
-	  
-      c= QString("%1").arg(m_current);
-      listener->port->write(qPrintable(c),1);
-	  
-     // qDebug() << "Sent to " << *m_serial_device << c << " starting at level " << m_current; 
+     // qDebug() << "painting level: " << m_current;
       qDebug() << "Read from " << *m_serial_device << listener->port->readAll();
 	  
 	  
       painter.drawPixmap(0,0, m_pixmap[m_current%8]);
 	  
-      if(drawmax-1>i) // dont swap after the last draw just flush
-	swapBuffers();
-      glFlush();
-      m_current+=m_direction;
-      m_total++;
+     if(drawmax-1>i) // dont swap after the last draw just flush
+		swapBuffers();
+     
+	glFlush();
+    m_current+=m_direction;
+    m_total++;
+	counter++;
       
       if(m_current > (m_num_images-1) )
 	{
 	  m_current = 0;
-	  m_direction = -m_direction;
+	  //m_direction = -m_direction;
 	}
-      else if(m_current < 0)
+     /* else if(m_current < 0)
 	{
 	  m_current = 0;
 	  m_direction = -m_direction;
-	}
+	}*/
       
       if(m_total==0)
 	{
