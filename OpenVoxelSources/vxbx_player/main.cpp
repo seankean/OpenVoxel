@@ -149,8 +149,8 @@ int main(int argc, char *argv[])
 		}
 	}
 	dump_args();
-	QGL::setPreferredPaintEngine(QPaintEngine::OpenGL);
-	QGLFormat *format = new QGLFormat(QGL::SampleBuffers);
+    QGL::setPreferredPaintEngine(QPaintEngine::OpenGL2);
+    QGLFormat *format = new QGLFormat(QGL::DoubleBuffer);
 	format->setSwapInterval(1); // vsync
 	Widget w(delay_before, delay_after, max_time, num_images,&serial_device,&camera_ip,&image_prefix,interlace_levels,numbers,0,format, rotate,&file_list_name);
 	
