@@ -1,3 +1,5 @@
+All the current make files rely on the standard install location
+on windows for QT4.  Change the make files to match your build.
 
 QT 4 (open source license)
 

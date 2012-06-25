@@ -1,0 +1,40 @@
+Building:
+
+Consult the README in the 3rdparty resources for dependencies.
+
+All the current make files rely on the standard install location
+on windows for QT4.  Change the make files to match your build.
+
+Windows: 
+
+	-Run make_windows.bat 
+	
+	Alternatively to build the release:
+	-From a Visual Studio command prompt run:
+	-qmake
+	-nmake release
+	or use jom if installed
+	-jom -j4 release
+
+Linux: Run qmake && make
+
+
+Mac: qmake && make
+
+Running VoxiePlayer:
+
+	-Extract the imagesets.zip file into the directory with the binary
+	
+	Windows: 
+	
+		-Run any of the batch scripts
+	
+	Linux & Mac: 
+	
+		-Copy the commands out of the batch scripts 
+		-Run from command line 
+		
+		
+Bugs:
+
+	-Running file_lists does not work (no multiple image display)

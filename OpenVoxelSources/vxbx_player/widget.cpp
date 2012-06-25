@@ -1,15 +1,13 @@
 #include "widget.h"
-//#include "helpers.h"
 #include <QThread>
 #include <QTimer>
 #include <QDebug>
 #include <QShortcut>
 #include <QtGui>
-
-
 #include "qextserialport.h" // serial for arduino
 #include "PortListener.h" // serial for arduino
 #include "config.h"
+
 class Helper: public QThread 
 {
 public:
@@ -122,21 +120,21 @@ void Widget::paintEvent(QPaintEvent *)
   QPainter painter(this);
   QThread t(this);
 
-  QElapsedTimer  loopTime; //time between frames
-  QElapsedTimer  drawTime; //time between frames
+//  QElapsedTimer  loopTime; //time between frames
+ // QElapsedTimer  drawTime; //time between frames
 
-  loopTime.start();
-  drawTime.start();
+ // loopTime.start();
+  //drawTime.start();
   
 int counter = 0;
   for(int i=0;i<drawmax;i++) 
    {
 
-    QElapsedTimer waitTime;
-    waitTime.restart();
+    //QElapsedTimer waitTime;
+    //waitTime.restart();
 
     //while(waitTime.elapsed() < 15)
-
+/*
     if(i == 0)
     {
         //loopTime->start();
@@ -149,36 +147,37 @@ int counter = 0;
         qDebug() << "Loop time took too long";
 
 
-    }
+    }*/
     counter = counter % 8;
     //time debugging
-    qDebug() << "One loop took: " << loopTime.elapsed() << " milliseconds";
-    loopTime.restart();
+    //qDebug() << "One loop took: " << loopTime.elapsed() << " milliseconds";
+    //loopTime.restart();
 
 	c= QString("%1").arg(counter);
 	listener->port->write(qPrintable(c),1);
-    qDebug() << "Current c: " << c;
-	qDebug() << "counter: " << counter;
-	qDebug() << "\n";
-    qDebug() << "Read from " << *m_serial_device << listener->port->readAll();
+    //qDebug() << "Current c: " << c;
+	//qDebug() << "counter: " << counter;
+	//qDebug() << "\n";
+    qDebug() << "Read from " << *m_serial_device << 
+	listener->port->readAll();
 
     //TIME HOW LONG IT TAKES TO DRAW TO THE SCREEN
-    drawTime.restart();
+    //drawTime.restart();
     painter.drawPixmap(0,0, m_pixmap[counter]);
-    qDebug() << "One draw took: " << drawTime.elapsed();
+    //qDebug() << "One draw took: " << drawTime.elapsed();
 	   
     //SWAP THE BUFFER
-    QElapsedTimer swapTime;
-    swapTime.restart();
+    //QElapsedTimer swapTime;
+    //swapTime.restart();
     swapBuffers();
-    qDebug() << "swap time took: " << swapTime.elapsed();
+    //qDebug() << "swap time took: " << swapTime.elapsed();
      
     //FLUSH THE BUFFER
-    QElapsedTimer flushTime;
+    //QElapsedTimer flushTime;
 
-    flushTime.restart();
+    //flushTime.restart();
     glFlush();
-    qDebug() << "flush time took: " << flushTime.elapsed();
+    //qDebug() << "flush time took: " << flushTime.elapsed();
 	counter++;
       
     }
